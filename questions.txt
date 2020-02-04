@@ -1,0 +1,14 @@
+Solve the following searching problems by graph A* search, report the followings: 
+(1) how many nodes ever existed in the 'fringe'; 
+(2) how many states every existed in the 'closed'; 
+(3) how many times 'h' has been estimated; 
+(4) how many children were not added to the 'fringe' since its state has been explored before; 
+(5) how much time were spent on  computing 'h'; 
+(6) how much time were spent on maintaining the priority queue 'fringe'. For each problem, answer 
+the above 6 questions using a simple table for easy evaluations. Submit a report, in in addition 
+to the source code.
+
+(1) Pancake sorting problem, see https://en.wikipedia.org/wiki/Pancake_sorting. Note that the 
+upper graph is the initial state.
+(2) Missionaries and cannibals problem. Three missionaries and three cannibals must cross a river using a boat which can carry at most two people, under the constraint that, for both banks, if there are missionaries present on the bank, they cannot be outnumbered by cannibals (if they were, the cannibals would eat the missionaries). The boat cannot cross the river by itself with no people on board. The initial state is all people on the right bank.
+(3) Bicolor Tower of Hanoi problem, see https://en.wikipedia.org/wiki/Tower_of_Hanoi. The initial and goal are shown in the diagram therein.
