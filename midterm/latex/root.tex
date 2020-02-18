@@ -72,11 +72,12 @@
 
 \maketitle
 
-\newpage
-
-%\renewcommand{\thesection}{Question \arabic{section}}
-
 \section{Hill climb}
+
+\subsection{Our implementation}
+
+Our naive implementation of the hill climbing algorithm is found in
+\texttt{hill\_climb.py} in the function \texttt{hill\_climb()}.
 
 \subsection{\texttt{grid1} and \texttt{grid2}}
 
@@ -97,7 +98,8 @@ $$
 \end{bmatrix}.
 $$
 
-The global maximum of \texttt{grid1} and \texttt{grid2} was trivial to find using
+Code which sets up and calls \texttt{hill\_climb()} for \texttt{grid1},
+\texttt{grid2}, and \texttt{grid3} is found in the same file. The global maximum of \texttt{grid1} and \texttt{grid2} was trivial to find using
 a naive implementation of the hill-climb. Both adjacent and diagonal state
 transitions were allowed to reduce the number of iterations.
 
@@ -118,7 +120,7 @@ transitions were allowed to reduce the number of iterations.
 \subsection{\texttt{grid3} is problematic}
 
 Observe in the table, in the previous section, the naive hill climbing algorithm fails
-to find the global maximum of \texttt{grid3} around the point $x^\star=(1,1)$.
+to find the global maximum of \texttt{grid3} around the point $\vect{x}^\star=(1,1)$.
 
 \begin{figure}[h!]
     \centering
@@ -144,13 +146,47 @@ $\vect{x}^\star$.
 
 \section{Simulated annealing}
 
+\subsection{Our implementation}
+
+Our implementation of simulated annealing is found in \texttt{simulated\_annealing.py}
+in the function \texttt{sa\_solve()}.
+
 \subsection{\texttt{grid1} and \texttt{grid2}}
+
+The code which sets up and runs \texttt{sa\_solve} for \texttt{grid1} and \texttt{grid2}
+is found is \texttt{sa\_grid12.py}.
+
+\begin{table}[h]
+    \centering
+    \caption{Simulated annealing for \texttt{grid1} and \texttt{grid2}}
+\begin{tabular}{c|cclr|c}
+    Function $f(x)$ & iterations & time $(ms)$ & $x^\star$ & $f(x^\star)$ & success \\
+    \hline
+    \texttt{grid1} & 21 & 1 & $(1,2)$ & 9 & yes \\
+    \texttt{grid2} & 351 & 5 & $(3,4)$ & 32 & yes \\
+\end{tabular}
+\end{table}
+
+For both \texttt{grid1} and \texttt{grid2} our implementation of simulated annealing
+finds the solution, although this technique is not ideal for these cases, which are
+well suited for hill climbing. Although we could tweak the cooling schedule and other
+parameters to achieve faster convergence, they are still about 1 order of magnitude
+slower than hill climbing.
+
+\emph{Note:} \texttt{sa\_solve()}'s adpative setting had to be disabled for \texttt{grid2}.
 
 \subsection{\texttt{grid3}}
 
+Code which calls \texttt{sa\_solve()} for \texttt{grid3} is found in \texttt{sa\_grid3.py}.
+
 \subsubsection{Cooling schedule}
 
-An adaptive additive exponential cooling schedule was used to find the global maximum 
+
+An adaptive additive exponential cooling schedule\footnote{%
+    \href{http://what-when-how.com/artificial-intelligence/a-comparison-of-cooling-schedules-for-simulated-annealing-artificial-intelligence/}%
+    {what-when-how.com, A Comparison of Cooling Schedules for Simulated Annealing (Artificial Intelligence)}%
+}
+    was used to find the global maximum 
 of \texttt{grid3}. 
 \begin{equation}
     T_k = T_n + (T_0 - T_n)
@@ -160,7 +196,7 @@ of \texttt{grid3}.
 
 Furthermore, we multiply $T_k$ by an adaptive term $1 \leq \mu \leq 2$ which
 is calculated using the distance between the value of the current state $f(s_i)$ and
-the best value encountered so far $f^\star$.
+$f^\star$, ie. the best value encountered so far\footnote{See footnote 1}.
 
 \begin{equation}
     T = \mu T_k =
@@ -198,10 +234,6 @@ cooling schedules were also tried, but failed to produce good results:
             \item exponential additive cooling.
         \end{enumerate}
 \end{enumerate}
-%1305
-%35754
-
-\newpage
 
 \subsubsection{Results}
 
@@ -216,7 +248,7 @@ very close to $\vect{x}^\star$ after $k=35754$ cycles, taking on average $1.31$ 
         \centering
         \subcaption{State trajectory}
         \def\svgwidth{\textwidth}
-        \import{../figures/}{figure3-1.pdf_tex}
+        \import{../figures/}{figure2-1.pdf_tex}
     \end{subfigure}%
     \begin{subfigure}{0.5\textwidth}%
         \centering
@@ -256,7 +288,24 @@ contained inside the narrow ridge containing $\vect{x}^\star$. This is an execel
 practical demonstration of simulated annealing's abilitiy to converge to to a global
 maximum, when other methods fail and/or get stuck in local maxima.
 
+\newpage
+
 \section{Traveling salesman problem}
+
+\subsection{Our implementation}
+
+Our implementation of the \texttt{2-opt} TSP solver is found in \texttt{tsp\_solver.py}.
+In addition to generating the figures below, the \texttt{dj38} problem is set up and 
+solved in \texttt{dj38\_solution.py}. 
+
+\emph{Note:} The class \texttt{DJ38Loader} will download and
+parse the dataset from%
+\footnote{\label{uw}%
+    \href{http://www.math.uwaterloo.ca/tsp/world/djtour.html}
+    {http://www.math.uwaterloo.ca/tsp/world/djtour.html}
+    DJ38 - Djibouti
+}, so running this code requires internet connectivity.
+
 
 \subsection{Results}
 
@@ -280,10 +329,6 @@ maximum, when other methods fail and/or get stuck in local maxima.
 Our implementation of \texttt{2-opt} finds the exact optimum tour
 after 20 iterations, in 318ms. The optimum tour length was found to
 be $f(\vect{t}^\star)= 6950$. Our results are identical with the results on the University
-of Waterloo's website\footnote{
-    \href{http://www.math.uwaterloo.ca/tsp/world/djtour.html}
-    {http://www.math.uwaterloo.ca/tsp/world/djtour.html}
-    DJ38 - Djibouti
-}.
+of Waterloo's website\footnote{See footnote 3.}.
 
 \end{document}
