@@ -14,13 +14,13 @@ def hill_climb(initial_state: Tuple[int, int],
     """Finds maximum value on discrete grid using hill climbing algorithm.
 
     Args:
-        initial_state: the starting state.
-        grid: discrete grid of function values.
-        max_epochs: maximum number of iterations.
-        log_interval: frequency of verbose output.
+        initial_state:  the starting state.
+        grid:           discrete grid of function values.
+        max_epochs:     maximum number of iterations.
+        log_interval:   frequency of verbose output.
 
     Returns:
-        tuple: Tuple containing index of max value and max value.
+        tuple:          Tuple containing index of max value and max value.
 
     """
 

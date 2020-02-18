@@ -48,12 +48,12 @@ def simulated_annealing(grid: np.array,
 
         i, j = state
 
-        alpha = 0.002
+        gamma = 0.002
         if epoch == 0:
             ema = (i, j)
         else:
-            ema = (alpha * i + (1 - alpha) * ema[0],
-                   alpha * j + (1 - alpha) * ema[1])
+            ema = (gamma * i + (1 - gamma) * ema[0],
+                   gamma * j + (1 - gamma) * ema[1])
 
         if epoch % 50 == 0:
             history_ema.append(ema)
@@ -68,8 +68,8 @@ def simulated_annealing(grid: np.array,
         history.append(state)
 
         if temperature <= temp_schedule.final_temp():
-            #            print('Solution found after {} cycles in {:.0f}s'.format(
-            #                temp_schedule.k(), perf_counter() - time_start))
+            print('Solution found after {} cycles in {:.0f}ms'.format(
+                temp_schedule.k(), (perf_counter() - time_start) * 1e3))
             return (state, e_current, history, history_ema, temp_hist)
 
         # Enumerate available states.

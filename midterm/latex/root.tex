@@ -144,32 +144,14 @@ $\vect{x}^\star$.
 
 \section{Simulated annealing}
 
-\subsection{grid3}
+\subsection{\texttt{grid1} and \texttt{grid2}}
 
-\subsubsection{Results}
+\subsection{\texttt{grid3}}
 
-\begin{figure}[h!]
-    \caption{Simulated annealing with adaptive exponential cooling schedule}
-    \centering
-    \begin{subfigure}{0.5\textwidth}%
-        \centering
-        \subcaption{State trajectory}
-        \def\svgwidth{\textwidth}
-        \import{../figures/}{figure3-1.pdf_tex}
-    \end{subfigure}%
-    \begin{subfigure}{0.5\textwidth}%
-        \centering
-        \subcaption{Adaptive-AE cooling schedule}
-        \def\svgwidth{\textwidth}
-        \import{../figures/}{figure3-2.pdf_tex}
-    \end{subfigure}%
-\end{figure}
+\subsubsection{Cooling schedule}
 
 An adaptive additive exponential cooling schedule was used to find the global maximum 
-of \texttt{grid3}. Due to the large number of steps, the white line denotes an
-exponential moving average or EMA of the trajectory with $\gamma=0.001$, instead of
-showing the whole state trajectory.
-
+of \texttt{grid3}. 
 \begin{equation}
     T_k = T_n + (T_0 - T_n)
     \left(\frac{1}{1+e^{\frac{2\ln\left(T_0-T_n\right)}{n}
@@ -187,6 +169,14 @@ the best value encountered so far $f^\star$.
 
 In practice, we take the \texttt{np.abs} and use \texttt{np.clip(x, 1, 2)}
 to ensure that these assumptions are maintained.
+
+The following parameters, initial temperature and number of cycles, denoted 
+$T_n$ and $n$ respectivly, resulted in consistent convergence to the global maximum
+near $\vect{x}^\star=(0,0)$:
+
+$$
+T_n = 10\quad\quad\text{and}\quad\quad n = 5000
+$$
 
 \subsubsection{Other cooling schedules considered}
 
@@ -208,5 +198,92 @@ cooling schedules were also tried, but failed to produce good results:
             \item exponential additive cooling.
         \end{enumerate}
 \end{enumerate}
+%1305
+%35754
+
+\newpage
+
+\subsubsection{Results}
+
+With the above parameters, our implementation of adaptive simulated annealing 
+consistently converged
+very close to $\vect{x}^\star$ after $k=35754$ cycles, taking on average $1.31$ seconds.
+
+\begin{figure}[h!]
+    \caption{Simulated annealing with adaptive exponential cooling schedule}
+    \centering
+    \begin{subfigure}{0.5\textwidth}%
+        \centering
+        \subcaption{State trajectory}
+        \def\svgwidth{\textwidth}
+        \import{../figures/}{figure3-1.pdf_tex}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}%
+        \centering
+        \subcaption{Adaptive-AE cooling schedule}
+        \def\svgwidth{\textwidth}
+        \import{../figures/}{figure3-2.pdf_tex}
+    \end{subfigure}%
+\end{figure}
+
+Due to the large number of steps $k$, instead of showing the whole state trajectory,
+the white line denotes an exponential moving average or EMA of the trajectory with 
+$\gamma=0.002$. Given the $k^{\mathrm{th}}$ state $s_k$, the EMA denoted $Y_k$ 
+is calculated recursively using
+
+\begin{equation}
+    Y_k = \begin{cases}
+        s_1    & \text{ for } k = 0 \\
+        \gamma s_k + (1-\gamma)s_{k-1} & \text{ for } k > 1
+    \end{cases}
+\end{equation}
+
+The blue cross denotes the solution found by our simulated annealing algorithm, and the
+red cross denotes $\vect{x}^\star = (0,0)^T$ which is the analytical solution of
+$\vect{x}^\star =
+    \mathrm{argmax}\:
+    f_3(\vect{x})$.     
+
+The figure on the right shows the exponential additive cooling schedule $T_k$
+being multiplied by a stochastic varrying term $1\leq \mu \leq 2$.
+
+\subsubsection{Discussion}
+
+In case of \texttt{grid3} our implementation of simulated annealing is able to overcome
+the shortcommings of the hill climbing algorithm in \emph{section 1}. Given an appropriate
+cooling schedule, the state trajectory is able to `jump' around in the isolated maxima
+contained inside the narrow ridge containing $\vect{x}^\star$. This is an execellent
+practical demonstration of simulated annealing's abilitiy to converge to to a global
+maximum, when other methods fail and/or get stuck in local maxima.
+
+\section{Traveling salesman problem}
+
+\subsection{Results}
+
+\begin{figure}[h!]
+    \caption{Using 2-opt to for \texttt{dj38}}
+    \centering
+    \begin{subfigure}{0.5\textwidth}%
+        \centering
+        \subcaption{Initial tour}
+        \def\svgwidth{\textwidth}
+        \import{../figures/}{figure4-1.pdf_tex}
+    \end{subfigure}%
+    \begin{subfigure}{0.5\textwidth}%
+        \centering
+        \subcaption{Optimum tour}
+        \def\svgwidth{\textwidth}
+        \import{../figures/}{figure4-2.pdf_tex}
+    \end{subfigure}%
+\end{figure}
+
+Our implementation of \texttt{2-opt} finds the exact optimum tour
+after 20 iterations, in 318ms. The optimum tour length was found to
+be $f(\vect{t}^\star)= 6950$. Our results are identical with the results on the University
+of Waterloo's website\footnote{
+    \href{http://www.math.uwaterloo.ca/tsp/world/djtour.html}
+    {http://www.math.uwaterloo.ca/tsp/world/djtour.html}
+    DJ38 - Djibouti
+}.
 
 \end{document}
