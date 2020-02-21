@@ -1,0 +1,86 @@
+% ------------------
+% -- Assignment 1 --
+% -- Math 4171 -----
+
+\documentclass[11pt,oneside]{article}
+
+%\usepackage{subfigure}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{hyperref}
+\usepackage{adjustbox}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{mathrsfs}
+\usepackage[driver=pdftex]{geometry}
+\usepackage{import}
+%\usepackage{titleformat{\section
+%        {\normalfont\normalzie\bfseries}{Helo.}{1em}{}
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{proof}{Proof}
+ 
+\lstset{style=mystyle}
+
+%\usepackage[margin=0.5in]{geometry}
+\usepackage{inputenc}
+
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\Int}{\mathbb{Z}}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\Complex}{\mathbb{C}}
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+
+\renewcommand{\Re}[1]{\mathfrak{Re}\left\lbrace{#1}\right\rbrace}
+\renewcommand{\Im}[1]{\mathfrak{Im}\left\lbrace{#1}\right\rbrace}
+
+\title{{\bf MATH 3172 3.0\\ Combinatorial Optimization}\\\vspace{10pt} \large Workshop 3     
+    \author{Jacques Nel}
+}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section{\texttt{minimax} algorithm}
+
+\section{\texttt{alpha-beta} algorithm}
+
+\section{\texttt{negmax} algorithm}
+
+\section{\texttt{mcts} Monte-Carlo Tree Search algorithm}
+
+
+\end{document}
