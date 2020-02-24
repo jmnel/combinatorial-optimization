@@ -151,3 +151,6 @@ def solve_hanoi_problem():
                               heuristic_fn=hanoi_disk_dist,
                               epochs=1000000,
                               print_fn=draw_state)
+
+
+solve_hanoi_problem()

@@ -1,104 +1,87 @@
-from typing import Tuple, Callable
 from time import perf_counter
-from time_utils import time_hr
-
-from util import argmax
-from ticktack import *
+from random import shuffle
+from typing import Callable, Tuple
 
 
-def minimax_search(state,
-                   util_fn,
-                   termination_fn,
-                   transitions_fn):
+def minimax_search(state: Tuple[int, ...],
+                   util_fn: Callable[[Tuple[int, ...]], float],
+                   expand_fn: Callable[[Tuple[int, ...]], Tuple[int, ...]],
+                   randomize: bool = False):
+    """
+    Picks optimal child state using minimax algorithm.
 
-    def max_value(state):
-        if termination_fn(state):
-            return util_fn(state)
+    Args:
+        state:      initial state from which to search
+        util_fn:    utility function
+        expand_fn:  function which enumerates children
+        randomize:  enables random shuffle
 
-        v = float('-inf')
+    Returns:
+        tuple:      tuple of optimal state, best estimate of utility, and internal statistics
 
-        neighbors = transitions_fn(state)
-#        print('max_value')
-        for n in neighbors:
-            v = max(v, min_value(n))
-#            print(f'  {v}  :  {n}')
+    """
 
-        return v
+    # This counter tracks number of calls to internal helper function.
+    stats = {'minimax_calls': 0}
 
-    def min_value(state):
-        if termination_fn(state):
-            return util_fn(state)
-
-        v = float('inf')
-
-        neighbors = transitions_fn(state)
-#        print('min_value')
-        for n in neighbors:
-            v = min(v, max_value(n))
-#            print(f'  {v}  :  {n}')
-
-        return v
-
+    # Start profiling timer.
     t_start = perf_counter()
 
-    neighbors = transitions_fn(state)
+    # This helper function is called recursively to estimate bounds of score for a state's chidren.
+    # This is the heart of the α-β prunning algorithm.
+    def _minimax(state: Tuple[int, ...], is_max_turn: bool):
 
-    v = tuple(max_value(n) for n in neighbors)
+        # Increment helper call statistics.
+        nonlocal stats
+        stats['minimax_calls'] += 1
 
-    i_optim = argmax(v)
+        # Determine utility of current state.
+        score = util_fn(state)
 
-    print('minimax: {}'.format(
-        time_hr(perf_counter() - t_start)))
+        # Utility function returns value for terminal leaves in search tree.
+        if score != None:
+            return (score, None)
 
-    return neighbors[i_optim]
+        # Expand current node.
+        actions = expand_fn(state)
 
+        # Shuffle children if randomize is enabled.
+        if randomize:
+            actions_l = list(actions)
+            shuffle(actions_l)
+            actions = tuple(actions_l)
 
-def util_fn(state):
+        # Keep track of best v score and associated child action.
+        best_v = float('-inf') if is_max_turn else float('inf')
+        best_action = None
 
-    board = make_board(state)
+        # Loop through children.
+        for a in actions:
 
-    check_seq = list()
-    for i in range(3):
-        row = board[i * 3:i * 3 + 3]
-        col = board[i:9:3]
-        check_seq.append(row)
-        check_seq.append(col)
-    diag1 = board[0:9:4]
-    diag2 = board[2:7:2]
-    check_seq.append(diag1)
-    check_seq.append(diag2)
+            # Call recursive helper on child.
+            child_v, child_action = _minimax(
+                a, not is_max_turn)
 
-    for p in (-1, 1):
-        w = [p] * 3
+            # If it's max's turn and better child found, do the following:
+            if is_max_turn and best_v < child_v:
+                best_v = child_v
+                best_action = a
 
-        for s in check_seq:
-            if s == w:
-                return -10. * p
+            # If it's min's turn and better child found, do the following:
+            elif not is_max_turn and best_v > child_v:
+                best_v = child_v
+                best_action = a
 
-    return 0.
+        return (best_v, best_action)
 
+    # Max goes 1st, then min, then so forth...
+    is_max_turn = len(state) % 2 == 0
 
-def transitions_fn(state: Tuple[int, ...]):
-    nodes = tuple(set(range(9)) - set(state))
-    neighbors = tuple(state + (n,) for n in nodes)
-    return neighbors
+    # Call helper on current state.
+    best_v, best_action = _minimax(state, is_max_turn)
 
+    # Update elapsed time performance timer.
+    stats['t_elapsed'] = perf_counter() - t_start
 
-def term_fn(state):
-    return len(state) == 9
-
-
-def util_flip(state):
-    return util_fn(state)
-
-
-s = (0, 2, 4)
-
-print()
-print(board_to_str(s))
-
-a = minimax_search(s, util_fn=util_flip,
-                   termination_fn=term_fn,
-                   transitions_fn=transitions_fn)
-
-print(board_to_str(a))
+    # Return optimal choice, its score, and statistics to caller.
+    return (best_action, best_v, stats)
