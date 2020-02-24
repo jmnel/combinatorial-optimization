@@ -1,109 +1,104 @@
-from typing import Tuple
-import numpy as np
-import copy
+from typing import Tuple, Callable
+from time import perf_counter
+from time_utils import time_hr
 
-init_state = list(
-    #    [0, 0, 0,
-    #     0, 0, 0,
-    #     0, 0, 0])
-    [-1, 0, 1,
-     0, 1, -1,
-     0, 0, 0])
-#init_state = list([i for i in range(1, 10)])
-
-# print(init_state)
+from util import argmax
+from ticktack import *
 
 
-def draw_state(s):
+def minimax_search(state,
+                   util_fn,
+                   termination_fn,
+                   transitions_fn):
 
-    s_e = list([' ' if e == 0 else 'x' if e == -1 else 'o' for e in s])
+    def max_value(state):
+        if termination_fn(state):
+            return util_fn(state)
 
-    s_str = ' {} │ {} │ {} \n'
-    s_str += '───┼───┼───\n'
-    s_str += ' {} │ {} │ {} \n'
-    s_str += '───┼───┼───\n'
-    s_str += ' {} │ {} │ {} \n'
+        v = float('-inf')
 
-    s_str = s_str.format(*s_e)
-    print(s_str)
+        neighbors = transitions_fn(state)
+#        print('max_value')
+        for n in neighbors:
+            v = max(v, min_value(n))
+#            print(f'  {v}  :  {n}')
+
+        return v
+
+    def min_value(state):
+        if termination_fn(state):
+            return util_fn(state)
+
+        v = float('inf')
+
+        neighbors = transitions_fn(state)
+#        print('min_value')
+        for n in neighbors:
+            v = min(v, max_value(n))
+#            print(f'  {v}  :  {n}')
+
+        return v
+
+    t_start = perf_counter()
+
+    neighbors = transitions_fn(state)
+
+    v = tuple(max_value(n) for n in neighbors)
+
+    i_optim = argmax(v)
+
+    print('minimax: {}'.format(
+        time_hr(perf_counter() - t_start)))
+
+    return neighbors[i_optim]
 
 
-def calc_score(s):
-    q = list()
+def util_fn(state):
+
+    board = make_board(state)
+
+    check_seq = list()
     for i in range(3):
-        r = s[i * 3:i * 3 + 3]
-        c = s[i:9:3]
-        q.append(r)
-        q.append(c)
-    d1 = s[0:9:4]
-    d2 = s[2:7:2]
-    q.append(d1)
-    q.append(d2)
+        row = board[i * 3:i * 3 + 3]
+        col = board[i:9:3]
+        check_seq.append(row)
+        check_seq.append(col)
+    diag1 = board[0:9:4]
+    diag2 = board[2:7:2]
+    check_seq.append(diag1)
+    check_seq.append(diag2)
 
     for p in (-1, 1):
-        w = [p, p, p]
+        w = [p] * 3
 
-        for c in q:
-            if c == w:
-                #                print(f'player {p} wins')
-                return (True, 10 * p)
+        for s in check_seq:
+            if s == w:
+                return -10. * p
 
-    return (False, 0)
-
-
-def transitions_fn(s, player):
-    actions = list()
-    for i in range(9):
-        if s[i] == 0:
-            a = copy.deepcopy(s)
-            a[i] = player
-            actions.append(a)
-    return actions
+    return 0.
 
 
-def max_value(s, p):
-    #    print(f'max s =\n')
-    #    print(f'{s}')
-    done, score = calc_score(s)
-    if done:
-        return score
-
-    v = float('-inf')
-
-    for a in transitions_fn(s, -p):
-        v = max(v, min_value(a, p))
-    return v
+def transitions_fn(state: Tuple[int, ...]):
+    nodes = tuple(set(range(9)) - set(state))
+    neighbors = tuple(state + (n,) for n in nodes)
+    return neighbors
 
 
-def min_value(s, p):
-    #    print(f'min s =\n')
-    #    print(f'{s}')
-    done, score = calc_score(s)
-    if done:
-        return score
-    v = float('inf')
-
-    for a in transitions_fn(s, -p):
-        v = min(v, max_value(a, p))
-    return v
+def term_fn(state):
+    return len(state) == 9
 
 
-def minimax(s, p):
-
-    print(f'Player {p}\'s turn:')
-
-    actions = transitions_fn(s, p)
-
-    s_a = list([(a, min_value(a, p)) for a in actions])
-#    s_a = list([(a, min_value(a) if player == 1 else min_value(a))
-#                for a in actions])
-
-    for a in s_a:
-        print(a[1])
-        draw_state(a[0])
+def util_flip(state):
+    return util_fn(state)
 
 
-print('init state:')
-draw_state(init_state)
+s = (0, 2, 4)
 
-minimax(init_state, -1)
+print()
+print(board_to_str(s))
+
+a = minimax_search(s, util_fn=util_flip,
+                   termination_fn=term_fn,
+                   transitions_fn=transitions_fn)
+
+print(board_to_str(a))

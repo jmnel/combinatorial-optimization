@@ -53,7 +53,7 @@ def calc_score(moves: Tuple[int, ...], player):
 
         for c in q:
             if c == w:
-                return (True, -10 * p * f)
+                return (True, (20 - len(moves)) * p * f)
 
     return (s.count(0) == 0, 0)
 
