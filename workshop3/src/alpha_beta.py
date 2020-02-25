@@ -22,7 +22,7 @@ def alpha_beta_search(state: Tuple[int, ...],
     """
 
     # This counter tracks number of calls to internal helper function.
-    stats = {'minimax_calls': 0}
+    stats = {'minimax_calls': 0, 'util_fn_evals': 0}
 
     # Start profiling timer.
     t_start = perf_counter()
@@ -34,6 +34,7 @@ def alpha_beta_search(state: Tuple[int, ...],
         # Increment helper call statistics.
         nonlocal stats
         stats['minimax_calls'] += 1
+        stats['util_fn_evals'] += 1
 
         # Determine utility of current state.
         score = util_fn(state)

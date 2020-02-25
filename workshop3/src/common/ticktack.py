@@ -1,65 +1,80 @@
 from typing import Tuple
 
 
-def make_board(moves: Tuple[int, ...]):
-    board = [0, ] * 9
+def state_to_board(state: Tuple[int, ...]):
+    board = [' '] * 9
 
-    p = -1
-    for m in moves:
-        board[m] = p
-        p *= -1
+    mark = 'x'
+    for mv in state:
+        board[mv] = mark
+        mark = 'o' if mark == 'x' else 'x'
 
     return board
 
 
-def moves_to_str(moves: Tuple[int, ...]):
-    moves_str = (str(m) for m in moves)
-    return '->'.join(moves_str)
-
-
-def board_to_str(moves: Tuple[int, ...]):
-
-    board = make_board(moves)
-
-    s_e = (' ' if e == 0 else 'x' if e == -1 else 'o' for e in board)
-
+def state_to_str(state: Tuple[int, ...]):
+    board = state_to_board(state)
     s_str = ' {} │ {} │ {} \n'
     s_str += '───┼───┼───\n'
     s_str += ' {} │ {} │ {} \n'
     s_str += '───┼───┼───\n'
     s_str += ' {} │ {} │ {} \n'
-
-    return s_str.format(*s_e)
-
-
-def calc_score(moves: Tuple[int, ...], player):
-
-    s = make_board(moves)
-    q = list()
-    for i in range(3):
-        r = s[i * 3:i * 3 + 3]
-        c = s[i:9:3]
-        q.append(r)
-        q.append(c)
-    d1 = s[0:9:4]
-    d2 = s[2:7:2]
-    q.append(d1)
-    q.append(d2)
-
-    f = 1 if player == 'x' else -1
-
-    for p in (-1, 1):
-        w = [p, p, p]
-
-        for c in q:
-            if c == w:
-                return (True, (20 - len(moves)) * p * f)
-
-    return (s.count(0) == 0, 0)
+    return s_str.format(*board)
 
 
-def transitions_fn(moves: Tuple[int, ...]):
-    n = tuple(set(range(9)) - set(moves))
+def score_weighted(state: Tuple[int, ...]):
+    """
+    Score function which results positive score for P1 win and negative for P2 win.
+    The score is weighted to favour earlier wins.
+    """
 
-    c = tuple(moves + (q,) for q in n)
+    # Convert set of moves to board form.
+    board = state_to_board(state)
+
+    # Take slices of board by rows.
+    rows = tuple(tuple(board[3 * i: 3 * (i + 1)]) for i in range(3))
+
+    # Take slices of board by columns.
+    cols = tuple(tuple(board[i:9:3]) for i in range(3))
+
+    # Take slices of 2 diagonals.
+    diag1 = tuple(board[0:9:4])
+    diag2 = tuple(board[2:7:2])
+
+    # Collect all 3-sequences to check for winning combinations.
+    win_seq = (*rows, *cols, diag1, diag2)
+
+    # Check if any sequence wins for player x or player o.
+    p1_win = any(s == ('x',) * 3 for s in win_seq)
+    p2_win = any(s == ('o',) * 3 for s in win_seq)
+
+    if p1_win:
+        # x win results in positive score; discounted by number of moves.
+        return (10. - len(state))
+
+    elif p2_win:
+        # o win results in negative score; discounted by number of moves.
+        return -(10. - len(state))
+
+    if len(state) == 9:
+        # A draw results in score of 0.
+        return 0.
+
+    else:
+        # Otherwise, a terminal state has not been reached.
+        return None
+
+
+def expand_basic(state):
+    """
+    Simple function which returns child states by appending an available move to 
+    current state.
+    """
+    assert(len(state) < 9)
+
+    # Calculte set difference to get remaining moves.
+    n = tuple(set(range(9)) - set(state))
+
+    # Create tuple of available new states and return to caller.
+    c = tuple(state + (q,) for q in n)
     return c

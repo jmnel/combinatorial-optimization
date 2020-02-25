@@ -1,29 +1,10 @@
 from __future__ import annotations
 from typing import Tuple, List
 from random import randint
+from time import perf_counter
 import numpy as np
 from common.util import argmax
-
-
-def state_to_board(state: Tuple[int, ...]):
-    board = [' '] * 9
-
-    mark = 'x'
-    for mv in state:
-        board[mv] = mark
-        mark = 'o' if mark == 'x' else 'x'
-
-    return board
-
-
-def state_to_str(state):
-    board = state_to_board(state)
-    s_str = ' {} │ {} │ {} \n'
-    s_str += '───┼───┼───\n'
-    s_str += ' {} │ {} │ {} \n'
-    s_str += '───┼───┼───\n'
-    s_str += ' {} │ {} │ {} \n'
-    return s_str.format(*board)
+from common.ticktack import *
 
 
 class Node:
@@ -61,29 +42,8 @@ class Node:
         return s
 
 
-def score(state: Tuple[int, ...]):
-    board = state_to_board(state)
-    rows = tuple(tuple(board[3 * i: 3 * (i + 1)]) for i in range(3))
-    cols = tuple(tuple(board[i:9:3]) for i in range(3))
-    diag1 = tuple(board[0:9:4])
-    diag2 = tuple(board[2:7:2])
-
-    win_seq = (*rows, *cols, diag1, diag2)
-    p1_win = any(s == ('x',) * 3 for s in win_seq)
-    p2_win = any(s == ('o',) * 3 for s in win_seq)
-
-    if p1_win:
-        return 1.
-    elif p2_win:
-        return 0.
-    elif len(state) == 9:
-        return 0.5
-    else:
-        return None
-
-
 def uct_search(init_state,
-               util_fn: Callable[[Tuple[int, ..]], float],
+               util_fn: Callable[[Tuple[int, ...]], float],
                selection_criteria: str = 'max_child',
                exploration_bias: float = 1. / np.sqrt(2.),
                max_epochs: int = 200,
@@ -93,6 +53,7 @@ def uct_search(init_state,
 
     Args:
         init_state:             initial root state from which to make choice
+        util_fn:                score calculation function
         selection_criteria:     choice of 'max_child', 'robust_child', 'max_rebust_child',
                                 or 'secure_child'
         exploration_bias:       bias which determines propensity to expand nodes
@@ -104,6 +65,15 @@ def uct_search(init_state,
         Tuple with optimal state, estimated score, and profiling statistics
 
     """
+
+    # This will store some profiling statistics.
+    stats = {'explored_count': 0,
+             'visit_count': 0,
+             'util_fn_evals': 0,
+             'simulation_time': 0}
+
+    # Start profiling timer.
+    t_start = perf_counter()
 
     def tree_policy(v: Node) -> Node:
         """
@@ -126,7 +96,13 @@ def uct_search(init_state,
 
     def default_policy(state: Tuple[int, ...]):
         while True:
-            scr = score(state)
+
+            # Evaluate utility function.
+            scr = util_fn(state)
+
+            # Update profiling statistics.
+            stats['util_fn_evals'] += 1
+
             if scr != None:
                 break
 
@@ -139,6 +115,9 @@ def uct_search(init_state,
         """
         Expands a given node with available action and adds new child to parent.
         """
+
+        # Update profiling statistics.
+        stats['explored_count'] += 1
 
         assert(len(v.a_collapsed) > 0)
 
@@ -182,6 +161,9 @@ def uct_search(init_state,
             # Increment visit count.
             v.n += 1
 
+            # Update profiling statistics.
+            stats['visit_count'] += 1
+
             # Propogate score.
             v.q += delta
 
@@ -197,7 +179,11 @@ def uct_search(init_state,
         for epoch in range(max_epochs):
 
             vl = tree_policy(root)
-            delta = 1.0 - default_policy(vl.state)
+
+            sim_t_start = perf_counter()
+            delta = default_policy(vl.state)
+            stats['simulation_time'] += perf_counter() - sim_t_start
+
             backup(vl, delta)
 
         # This helper extracts appropriate value from child depending on selection criteria.
@@ -218,9 +204,16 @@ def uct_search(init_state,
                 return uct
 
         # Return state of optimal child to caller.
-        return root.children[argmax(
-            (crit_selector(selection_criteria, c)
-                for c in root.children))].state
+        optim_child = root.children[
+            argmax(
+                (crit_selector(selection_criteria, c)
+                 for c in root.children))
+        ]
+
+        optim_score = crit_selector(selection_criteria, optim_child)
+        stats['t_elapsed'] = t_start - perf_counter()
+
+        return (optim_child.state, optim_score, stats)
 
     # Handle selection criteria b max-robust-child.
     elif selection_criteria == 'max_robust':
@@ -245,16 +238,15 @@ def uct_search(init_state,
 
                 # If above 2 indices agree, return state of optimal node to caller.
                 if q_max == n_max:
-                    return root.children[q_max].state
+
+                    optim_child = root.children[q_max]
+                    optim_score = (optim_child.q, optim_child.n)
+                    stats['t_elapsed'] = t_start - perf_counter()
+
+                    return (optim_child.state, optim_score, stats)
 
     # Selection criteria is invalid.
     else:
         # Throw exception.
         raise ValueError(
             'selection_criteria must be one of \'max\', \'robust\', \'max_robust\', or \'secure\'.')
-
-
-init_state = (0, 4, 2)
-print(state_to_str(init_state))
-
-uct_search(init_state)
