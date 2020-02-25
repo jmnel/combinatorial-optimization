@@ -1,7 +1,10 @@
-from typing import Sequence
+from typing import Sequence, Tuple
 
 
 def argmax(seq: Sequence):
+
+    assert(any(True for _ in seq))
+
     v_max = float('-inf')
     i_max = 0
     for i, v in enumerate(seq):
