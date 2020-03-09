@@ -1,23 +1,14 @@
 from time import perf_counter
 from typing import Tuple
 from random import shuffle
-from alpha_beta import alpha_beta_search
+from minimax import minimax_search
 from common.time_utils import time_hr
 from common.ticktack import *
-from common_ab import *
 
 
-def alpha_beta_random_state():
+def test_minimax_random_state():
 
-    def two_player_score(state: Tuple[int, ...]):
-        scr = score(state)
-        if len(state) % 2 == 1:
-            if scr is not None:
-                scr = 1. - scr
-
-        return scr
-
-    num_trials = 20
+    num_trials = 10
     epochs = 200
 
     for n in range(9):
@@ -34,10 +25,10 @@ def alpha_beta_random_state():
 
             t_start = perf_counter()
 
-            _, _, stats = alpha_beta_search(init_state,
-                                            util_fn=two_player_score,
-                                            expand_fn=expand,
-                                            randomize=True)
+            _, _, stats = minimax_search(init_state,
+                                         util_fn=score_weighted,
+                                         expand_fn=expand_basic,
+                                         randomize=True)
 
             t_avg += perf_counter() - t_start
             util_fn_evals_avg += stats['util_fn_evals']
@@ -52,6 +43,3 @@ def alpha_beta_random_state():
         print(f'  running time: {time_hr(t_avg)}')
         print(
             f'  minimax calls: {minimax_calls_avg}, util function calls: {util_fn_evals_avg}\n')
-
-
-alpha_beta_random_state()

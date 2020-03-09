@@ -3,12 +3,12 @@ from random import shuffle
 from typing import Callable, Tuple
 
 
-def minimax_search(state: Tuple[int, ...],
-                   util_fn: Callable[[Tuple[int, ...]], float],
-                   expand_fn: Callable[[Tuple[int, ...]], Tuple[int, ...]],
-                   randomize: bool = False):
+def alpha_beta_search(state: Tuple[int, ...],
+                      util_fn: Callable[[Tuple[int, ...]], float],
+                      expand_fn: Callable[[Tuple[int, ...]], Tuple[int, ...]],
+                      randomize: bool = False):
     """
-    Picks optimal child state using minimax algorithm.
+    Picks optimal child state using α-β pruning algorithm.
 
     Args:
         state:      initial state from which to search
@@ -29,7 +29,7 @@ def minimax_search(state: Tuple[int, ...],
 
     # This helper function is called recursively to estimate bounds of score for a state's chidren.
     # This is the heart of the α-β prunning algorithm.
-    def _minimax(state: Tuple[int, ...], is_max_turn: bool):
+    def _minimax(state: Tuple[int, ...], alpha: float, beta: float, is_max_turn: bool):
 
         # Increment helper call statistics.
         nonlocal stats
@@ -61,17 +61,27 @@ def minimax_search(state: Tuple[int, ...],
 
             # Call recursive helper on child.
             child_v, child_action = _minimax(
-                a, not is_max_turn)
+                a, alpha, beta, not is_max_turn)
 
             # If it's max's turn and better child found, do the following:
             if is_max_turn and best_v < child_v:
                 best_v = child_v
                 best_action = a
 
+                # Update α and skip known worse nodes.
+                alpha = max(alpha, best_v)
+                if beta <= alpha:
+                    break
+
             # If it's min's turn and better child found, do the following:
             elif not is_max_turn and best_v > child_v:
                 best_v = child_v
                 best_action = a
+
+                # Update β and skip known worse nodes.
+                beta = min(beta, best_v)
+                if beta <= alpha:
+                    break
 
         return (best_v, best_action)
 
@@ -79,7 +89,9 @@ def minimax_search(state: Tuple[int, ...],
     is_max_turn = len(state) % 2 == 0
 
     # Call helper on current state.
-    best_v, best_action = _minimax(state, is_max_turn)
+    best_v, best_action = _minimax(state,
+                                   float('-inf'), float('inf'),
+                                   is_max_turn)
 
     # Update elapsed time performance timer.
     stats['t_elapsed'] = perf_counter() - t_start

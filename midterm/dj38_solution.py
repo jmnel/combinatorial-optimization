@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib
-matplotlib.use('GTK3Cairo')
+matplotlib.use('Qt5Cairo')
 import matplotlib.pyplot as plt
 from dj38_loader import DJ38Loader
 from tsp_solver import tsp_solve
@@ -27,22 +27,24 @@ def solve_dj38():
     optim_tour_points = np.array([cities[i] for i in optim_tour])
 
     fig, ax = plt.subplots()
-    ax.plot(initial_tour_points[:, 0], initial_tour_points[:, 1], 'red',
-            linewidth=0.8, zorder=-30)
+#    ax.plot(initial_tour_points[:, 0], initial_tour_points[:, 1], 'red',
+#            linewidth=0.8, zorder=-30)
     ax.scatter(cities[:, 0], cities[:, 1], c='blue')
     ax.set_xlabel('x')
     ax.set_ylabel('y')
-    plt.savefig(fname='figures/figure4-1.svg')
 
-    plt.cla()
+#    plt.show()
+#    plt.savefig(fname='figures/figure4-1.svg')
+
+#    plt.cla()
     ax.plot(optim_tour_points[:, 0], optim_tour_points[:, 1], 'red',
             linewidth=0.8, zorder=-30)
     ax.scatter(cities[:, 0], cities[:, 1], c='blue')
     ax.set_xlabel('x')
     ax.set_ylabel('y')
-    plt.savefig(fname='figures/figure4-2.svg')
+#    plt.savefig(fname='figures/figure4-2.svg')
 
-#    plt.show()
+    plt.show()
 
 
 solve_dj38()

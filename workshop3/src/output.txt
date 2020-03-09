@@ -1,0 +1,458 @@
+Profiling minimax...
+
+For n=0 available states, avg. statistics over 10 runs:
+  running time: 4.94s
+  minimax calls: 549946.0, util function calls: 549946.0
+
+For n=1 available states, avg. statistics over 10 runs:
+  running time: 540ms
+  minimax calls: 60125.0, util function calls: 60125.0
+
+For n=2 available states, avg. statistics over 10 runs:
+  running time: 70ms
+  minimax calls: 7772.8, util function calls: 7772.8
+
+For n=3 available states, avg. statistics over 10 runs:
+  running time: 10ms
+  minimax calls: 1063.8, util function calls: 1063.8
+
+For n=4 available states, avg. statistics over 10 runs:
+  running time: 2ms
+  minimax calls: 183.6, util function calls: 183.6
+
+For n=5 available states, avg. statistics over 10 runs:
+  running time: 376μs
+  minimax calls: 41.0, util function calls: 41.0
+
+For n=6 available states, avg. statistics over 10 runs:
+  running time: 90μs
+  minimax calls: 9.3, util function calls: 9.3
+
+For n=7 available states, avg. statistics over 10 runs:
+  running time: 35μs
+  minimax calls: 3.5, util function calls: 3.5
+
+For n=8 available states, avg. statistics over 10 runs:
+  running time: 14μs
+  minimax calls: 1.4, util function calls: 1.4
+
+
+Profiling alpha-beta...
+
+For n=0 available states, avg. statistics over 20 runs:
+  running time: 46ms
+  minimax calls: 4512.45, util function calls: 4512.45
+
+For n=1 available states, avg. statistics over 20 runs:
+  running time: 19ms
+  minimax calls: 1934.45, util function calls: 1934.45
+
+For n=2 available states, avg. statistics over 20 runs:
+  running time: 6ms
+  minimax calls: 558.3, util function calls: 558.3
+
+For n=3 available states, avg. statistics over 20 runs:
+  running time: 2ms
+  minimax calls: 189.25, util function calls: 189.25
+
+For n=4 available states, avg. statistics over 20 runs:
+  running time: 681μs
+  minimax calls: 68.25, util function calls: 68.25
+
+For n=5 available states, avg. statistics over 20 runs:
+  running time: 234μs
+  minimax calls: 23.4, util function calls: 23.4
+
+For n=6 available states, avg. statistics over 20 runs:
+  running time: 73μs
+  minimax calls: 6.75, util function calls: 6.75
+
+For n=7 available states, avg. statistics over 20 runs:
+  running time: 35μs
+  minimax calls: 3.35, util function calls: 3.35
+
+For n=8 available states, avg. statistics over 20 runs:
+  running time: 14μs
+  minimax calls: 1.35, util function calls: 1.35
+
+
+Profiling negamax...
+
+For n=9 available states, avg. statistics over 10 runs:
+  running time: 4.55s
+  negamax calls: 549945.0, util function calls: 549945.0
+
+For n=8 available states, avg. statistics over 10 runs:
+  running time: 493ms
+  negamax calls: 60124.0, util function calls: 60124.0
+
+For n=7 available states, avg. statistics over 10 runs:
+  running time: 63ms
+  negamax calls: 7745.0, util function calls: 7745.0
+
+For n=6 available states, avg. statistics over 10 runs:
+  running time: 8ms
+  negamax calls: 1034.6, util function calls: 1034.6
+
+For n=5 available states, avg. statistics over 10 runs:
+  running time: 1ms
+  negamax calls: 177.6, util function calls: 177.6
+
+For n=4 available states, avg. statistics over 10 runs:
+  running time: 270μs
+  negamax calls: 32.7, util function calls: 32.7
+
+For n=3 available states, avg. statistics over 10 runs:
+  running time: 82μs
+  negamax calls: 9.4, util function calls: 9.4
+
+For n=2 available states, avg. statistics over 10 runs:
+  running time: 26μs
+  negamax calls: 2.7, util function calls: 2.7
+
+For n=1 available states, avg. statistics over 10 runs:
+  running time: 12μs
+  negamax calls: 1.0, util function calls: 1.0
+
+
+Profiling mcts...
+
+For n=0 available states, avg. statistics over 100 runs:
+  running time: 23ms, simulation time: 11ms
+  explore count: 200.0, visit count: 710.0,  util. function evals: 1215.7
+
+For n=1 available states, avg. statistics over 100 runs:
+  running time: 21ms, simulation time: 10ms
+  explore count: 200.0, visit count: 728.03,  util. function evals: 1002.99
+
+For n=2 available states, avg. statistics over 100 runs:
+  running time: 18ms, simulation time: 7ms
+  explore count: 200.0, visit count: 750.5,  util. function evals: 784.56
+
+For n=3 available states, avg. statistics over 100 runs:
+  running time: 15ms, simulation time: 5ms
+  explore count: 200.0, visit count: 811.04,  util. function evals: 522.25
+
+For n=4 available states, avg. statistics over 100 runs:
+  running time: 13ms, simulation time: 3ms
+  explore count: 169.72, visit count: 945.07,  util. function evals: 318.56
+
+For n=5 available states, avg. statistics over 100 runs:
+  running time: 10ms, simulation time: 2ms
+  explore count: 58.86, visit count: 941.23,  util. function evals: 223.98
+
+For n=6 available states, avg. statistics over 100 runs:
+  running time: 7ms, simulation time: 2ms
+  explore count: 14.98, visit count: 788.0,  util. function evals: 204.91
+
+For n=7 available states, avg. statistics over 100 runs:
+  running time: 5ms, simulation time: 2ms
+  explore count: 4.0, visit count: 598.0,  util. function evals: 200.83
+
+For n=8 available states, avg. statistics over 100 runs:
+  running time: 3ms, simulation time: 2ms
+  explore count: 1.0, visit count: 400.0,  util. function evals: 200.0
+
+
+Running self play examples...
+Running self play with minimax algorithm...
+	Using weighted score
+
+   │   │   
+───┼───┼───
+   │   │   
+───┼───┼───
+   │   │   
+
+Thinking...
+
+minimax algorithm found move with v=0.0 in 5.01s.
+
+   │   │   
+───┼───┼───
+   │   │   
+───┼───┼───
+ x │   │   
+
+Thinking...
+
+minimax algorithm found move with v=0.0 in 537ms.
+
+   │   │   
+───┼───┼───
+   │ o │   
+───┼───┼───
+ x │   │   
+
+Thinking...
+
+minimax algorithm found move with v=0.0 in 66ms.
+
+   │   │   
+───┼───┼───
+   │ o │   
+───┼───┼───
+ x │ x │   
+
+Thinking...
+
+minimax algorithm found move with v=0.0 in 8ms.
+
+   │   │   
+───┼───┼───
+   │ o │   
+───┼───┼───
+ x │ x │ o 
+
+Thinking...
+
+minimax algorithm found move with v=0.0 in 2ms.
+
+ x │   │   
+───┼───┼───
+   │ o │   
+───┼───┼───
+ x │ x │ o 
+
+Thinking...
+
+minimax algorithm found move with v=0.0 in 435μs.
+
+ x │   │   
+───┼───┼───
+ o │ o │   
+───┼───┼───
+ x │ x │ o 
+
+Thinking...
+
+minimax algorithm found move with v=0.0 in 133μs.
+
+ x │   │   
+───┼───┼───
+ o │ o │ x 
+───┼───┼───
+ x │ x │ o 
+
+Thinking...
+
+minimax algorithm found move with v=0.0 in 50μs.
+
+ x │   │ o 
+───┼───┼───
+ o │ o │ x 
+───┼───┼───
+ x │ x │ o 
+
+Thinking...
+
+minimax algorithm found move with v=0.0 in 21μs.
+
+ x │ x │ o 
+───┼───┼───
+ o │ o │ x 
+───┼───┼───
+ x │ x │ o 
+
+Result score: 0.0 -> Draw!
+Running self play with α-β pruning algorithm...
+	Using weighted score score
+	randomization enabled
+
+   │   │   
+───┼───┼───
+   │   │   
+───┼───┼───
+   │   │   
+
+Thinking...
+
+α-β pruning algorithm found move with v=0.0 in 159ms.
+
+   │   │ x 
+───┼───┼───
+   │   │   
+───┼───┼───
+   │   │   
+
+Thinking...
+
+α-β pruning algorithm found move with v=0.0 in 34ms.
+
+   │   │ x 
+───┼───┼───
+   │ o │   
+───┼───┼───
+   │   │   
+
+Thinking...
+
+α-β pruning algorithm found move with v=0.0 in 10ms.
+
+   │   │ x 
+───┼───┼───
+   │ o │   
+───┼───┼───
+ x │   │   
+
+Thinking...
+
+α-β pruning algorithm found move with v=0.0 in 4ms.
+
+   │   │ x 
+───┼───┼───
+ o │ o │   
+───┼───┼───
+ x │   │   
+
+Thinking...
+
+α-β pruning algorithm found move with v=0.0 in 642μs.
+
+   │   │ x 
+───┼───┼───
+ o │ o │ x 
+───┼───┼───
+ x │   │   
+
+Thinking...
+
+α-β pruning algorithm found move with v=0.0 in 461μs.
+
+   │   │ x 
+───┼───┼───
+ o │ o │ x 
+───┼───┼───
+ x │   │ o 
+
+Thinking...
+
+α-β pruning algorithm found move with v=0.0 in 195μs.
+
+ x │   │ x 
+───┼───┼───
+ o │ o │ x 
+───┼───┼───
+ x │   │ o 
+
+Thinking...
+
+α-β pruning algorithm found move with v=0.0 in 74μs.
+
+ x │ o │ x 
+───┼───┼───
+ o │ o │ x 
+───┼───┼───
+ x │   │ o 
+
+Thinking...
+
+α-β pruning algorithm found move with v=0.0 in 31μs.
+
+ x │ o │ x 
+───┼───┼───
+ o │ o │ x 
+───┼───┼───
+ x │ x │ o 
+
+Result score: 0.0 -> Draw!
+Running self play with negamax algorithm...
+	Using weigthed score
+
+   │   │   
+───┼───┼───
+   │   │   
+───┼───┼───
+   │   │   
+
+Thinking...
+
+negamax algorithm found move with v=0.0 in 147ms.
+
+   │   │   
+───┼───┼───
+   │   │   
+───┼───┼───
+ x │   │   
+
+Thinking...
+
+negamax algorithm found move with v=0.0 in 23ms.
+
+   │   │   
+───┼───┼───
+   │ o │   
+───┼───┼───
+ x │   │   
+
+Thinking...
+
+negamax algorithm found move with v=0.0 in 9ms.
+
+   │   │   
+───┼───┼───
+   │ o │   
+───┼───┼───
+ x │ x │   
+
+Thinking...
+
+negamax algorithm found move with v=0.0 in 2ms.
+
+   │   │   
+───┼───┼───
+   │ o │   
+───┼───┼───
+ x │ x │ o 
+
+Thinking...
+
+negamax algorithm found move with v=0.0 in 807μs.
+
+ x │   │   
+───┼───┼───
+   │ o │   
+───┼───┼───
+ x │ x │ o 
+
+Thinking...
+
+negamax algorithm found move with v=0.0 in 300μs.
+
+ x │   │   
+───┼───┼───
+ o │ o │   
+───┼───┼───
+ x │ x │ o 
+
+Thinking...
+
+negamax algorithm found move with v=0.0 in 137μs.
+
+ x │   │   
+───┼───┼───
+ o │ o │ x 
+───┼───┼───
+ x │ x │ o 
+
+Thinking...
+
+negamax algorithm found move with v=0.0 in 52μs.
+
+ x │   │ o 
+───┼───┼───
+ o │ o │ x 
+───┼───┼───
+ x │ x │ o 
+
+Thinking...
+
+negamax algorithm found move with v=0.0 in 22μs.
+
+ x │ x │ o 
+───┼───┼───
+ o │ o │ x 
+───┼───┼───
+ x │ x │ o 
+
+Result score: 0.0 -> Draw!

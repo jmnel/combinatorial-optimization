@@ -67,7 +67,8 @@ def score_weighted(state: Tuple[int, ...]):
 
 def score_mcts(state: Tuple[int, ...]):
     """
-    Gets score in range [0, 1]
+    Score function which results positive score for P1 win and negative for P2 win.
+    The score lies in range [0, 1].
     """
 
     # Convert set of moves to board form.
@@ -92,18 +93,15 @@ def score_mcts(state: Tuple[int, ...]):
 
     if p1_win:
         # x win results in positive score; discounted by number of moves.
-        return 1.
-#        return (10. - len(state))
+        return 1.0
 
     elif p2_win:
-        return 0.
         # o win results in negative score; discounted by number of moves.
-#        return -(10. - len(state))
+        return 0.0
 
     if len(state) == 9:
-        return 0.5
         # A draw results in score of 0.
-#        return 0.
+        return 0.5
 
     else:
         # Otherwise, a terminal state has not been reached.
@@ -112,7 +110,7 @@ def score_mcts(state: Tuple[int, ...]):
 
 def two_player_score(state: Tuple[int, ...]):
     """Calculates two player in range [0,1]."""
-    scr = score_weighted(state)
+    scr = score_mcts(state)
     if len(state) % 2 == 1:
         if scr is not None:
             scr = 1. - scr

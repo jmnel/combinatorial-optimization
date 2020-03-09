@@ -1,12 +1,12 @@
 from time import perf_counter
 from typing import Tuple
 from random import shuffle
-from mcts import uct_search
+from alpha_beta import alpha_beta_search
 from common.time_utils import time_hr
 from common.ticktack import *
 
 
-def mcts_random_state():
+def test_alpha_beta_random_state():
 
     def score(state: Tuple[int, ...]):
         board = state_to_board(state)
@@ -22,9 +22,9 @@ def mcts_random_state():
         if p1_win:
             return 1.
         elif p2_win:
-            return 0.
+            return -1.
         elif len(state) == 9:
-            return 0.5
+            return 0.0
         else:
             return None
 
@@ -36,16 +36,14 @@ def mcts_random_state():
 
         return scr
 
-    num_trials = 100
+    num_trials = 20
     epochs = 200
 
     for n in range(9):
 
         t_avg = 0.
-        explore_count_avg = 0
-        visit_count_avg = 0
+        minimax_calls_avg = 0
         util_fn_evals_avg = 0
-        sim_time_avg = 0
 
         for trial in range(num_trials):
             init_state = list(range(9))
@@ -55,30 +53,21 @@ def mcts_random_state():
 
             t_start = perf_counter()
 
-            _, _, stats = uct_search(init_state,
-                                     util_fn=two_player_score,
-                                     selection_criteria='max_child',
-                                     max_epochs=epochs)
+            _, _, stats = alpha_beta_search(init_state,
+                                            util_fn=two_player_score,
+                                            expand_fn=expand_basic,
+                                            randomize=True)
 
             t_avg += perf_counter() - t_start
-            explore_count_avg += stats['explored_count']
-            visit_count_avg += stats['visit_count']
             util_fn_evals_avg += stats['util_fn_evals']
-            sim_time_avg += stats['simulation_time']
+            minimax_calls_avg += stats['minimax_calls']
 
         t_avg /= num_trials
-        explore_count_avg /= num_trials
-        visit_count_avg /= num_trials
         util_fn_evals_avg /= num_trials
-        sim_time_avg /= num_trials
+        minimax_calls_avg /= num_trials
 
         print(
             f'For n={n} available states, avg. statistics over {num_trials} runs:')
+        print(f'  running time: {time_hr(t_avg)}')
         print(
-            f'  running time: {time_hr(t_avg)}, simulation time: {time_hr(sim_time_avg)}')
-        print(
-            f'  explore count: {explore_count_avg}, visit count: {visit_count_avg},', end='')
-        print(f'  util. function evals: {util_fn_evals_avg}\n')
-
-
-mcts_random_state()
+            f'  minimax calls: {minimax_calls_avg}, util function calls: {util_fn_evals_avg}\n')

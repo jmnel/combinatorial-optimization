@@ -5,7 +5,6 @@ from time import perf_counter
 import numpy as np
 from common.util import argmax
 from common.ticktack import *
-from common.ticktack import score
 
 
 class Node:
@@ -210,11 +209,6 @@ def uct_search(init_state,
                 (crit_selector(selection_criteria, c)
                  for c in root.children))
         ]
-
-        for c in root.children:
-            print(f'{c.a_incoming}')
-            print(f'\tn={c.n}')
-            print(f'\tq={c.q}')
 
         optim_score = crit_selector(selection_criteria, optim_child)
         stats['t_elapsed'] = t_start - perf_counter()
