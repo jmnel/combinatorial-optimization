@@ -1,37 +1,51 @@
+"""
+Cane sugar production
+"""
+
 from math import ceil
 
-loss = [43, 26, 37, 28, 13, 54, 62, 49, 19, 28, 30]
-life_span = [8, 8, 2, 8, 4, 8, 8, 8, 6, 8, 8] 
+# Each lot has an associated hourly loss.
+LOSS = [43, 26, 37, 28, 13, 54, 62, 49, 19, 28, 30]
 
-nw = len(loss)
-nl = 3
-wagons = list(range(nw))
+# Remaining lifetime for the product in each lot.
+LIFE = [8, 8, 2, 8, 4, 8, 8, 8, 6, 8, 8]
 
-ns = ceil(nw / nl)
+# A given lot takes 2 hours to process.
+DUR = 2
 
-slots = list(range(ns))
+# Get the number of wagons.
+NW = len(LOSS)
 
+# The refinery has 3 equivalent production lines.
+NL = 3
 
+# Enumerate the wagons.
+WAGONS = list(range(NW))
 
-sw = Index([(w, s) for w in wagons for s in slots])
+# Number of slots is determined by rounding up number of wagons devided by number of lines.
+NS = ceil(NW / NL)
 
-process = Variable(index=sw, vartype='binary')
+# Enumerate slots.
+SLOTS = list(range(NS))
 
-print('foo')
+# Combined double index with wagon-slot.
+WS = Index([(w, s) for w in WAGONS for s in SLOTS])
 
-#w = 0
+# Binary decision variable; indicates lot w is processed in slot s.
+x = Variable(index=WS, vartype='binary')
 
-#q = Constraint( [ sum(process[w, s] for s in slots) == 1 for w in wagons ], index=wagons )
-#print(q)1
+# Every lot is assigned to exactly one slot.
+cstr1 = Constraint([sum(x[w, s] for s in SLOTS) == 1 for w in WAGONS], index=WAGONS)
 
-#foo = list()
+# Limit lots per time slot.
+cstr2 = Constraint([sum(x[w, s] for w in WAGONS) <= NL for s in SLOTS], index=SLOTS)
 
-#for w in wagons:
+# Limit unprocessed product life.
+cstr3 = Constraint([sum((s+1) * x[w,s] for s in SLOTS) <= LIFE[w] / DUR for w in WAGONS], index=WAGONS)
 
-	#c = Constraint( sum(process[w, s] for s in slots) == 1 )
-	#foo.append(c)
+# Loss function is simply amount of raw material lost due to fermentation from delay in processing.
+loss_fn = Objective( sum( [(s+1) * DUR * LOSS[w] * x[w, s] for w, s in WS]))
 
-#for c in foo:
-#	print(c)
-
-#print(process)
+# Define and solve problem.
+sugar_model = Problem([x], loss_fn, [cstr1, cstr2, cstr3] )
+cbc_minimize(sugar_model)
