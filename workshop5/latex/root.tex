@@ -368,7 +368,67 @@ the reason why my results differ slightly from the book.
 
 \section{D-5 Cutting sheet metal}
 
+\begin{table}[h]
+    \center
+    \caption{Summary of cutting patterns}
+    \begin{tabular}{ccccccccccccccccc}
+        \hline
+        \textbf{Pattern} & \textbf{1}& \textbf{2}& \textbf{3}& \textbf{4}& \textbf{5}& \textbf{6}& \textbf{7}& \textbf{8}& \textbf{9}& \textbf{10}& \textbf{11}& \textbf{12}& \textbf{13}& \textbf{14}& \textbf{15}& \textbf{16} \\
+        \hline
+        \textbf{36 x 50} & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        \textbf{24 x 36} & 2 & 1 & 0 & 2 & 1 & 0 & 3 & 2 & 1 & 0 & 5 & 4 & 3 & 2 & 1 & 0 \\
+        \textbf{20 x 60} & 0 & 0 & 0 & 2 & 2 & 2 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        \textbf{18 x 30} & 0 & 1 & 3 & 0 & 1 & 3 & 0 & 2 & 3 & 5 & 0 & 1 & 3 & 5 & 6 & 8 \\
+        \hline
+    \end{tabular}
+\end{table}
 
+\subsection{Parameters}
+
+Let $S =\lbrace 0, \ldots n-1\rbrace$ with $n=4$ enumerate the sizes
+$\lbrace \texttt{36x50}, \texttt{24x36}, \texttt{20x60}, \texttt{18x30}\rbrace$.
+Let $P=\lbrace 0, \ldots m-1\rbrace$ enumerate the cutting patterns with $m=16$.
+
+For $s\in S$ and $p\in P$, let
+
+$d_{s}$ : demand for size $s$,
+
+$c_{sp}$ : from the table above; with yields of each pattern,
+
+$K=1$ : the cost of each pattern; simply cost of invidual raw sheet material
+
+\subsection{Decision variables}
+
+Let $0 \leq u_p \in \Int$ be a integer decision variable denoting the number
+of times pattern $p$ is used.
+
+\subsection{Model}
+
+The objective is simply the total raw material cost, ie. the number of sheets
+of metal used.
+
+$$
+\minimize \sum_{p\in P} u_p K
+$$
+
+subject to the following constraints:
+
+\begin{eqnarray}
+    \sum_{p\in P} c_{sp}u_p \geq d_{s}, \forall s \in S \\
+    u_p \geq 0, \forall p\in P
+\end{eqnarray}
+
+\subsection{Results}
+
+An optimal solution is found which uses 11 sheets of raw material to satisfy
+demand, with a objective function value of 11. The following quantities of each pattern
+are used:
+
+\texttt{pattern 1} = 3,
+\texttt{pattern 3} = 5,
+\texttt{pattern 4} = 2,
+\texttt{pattern 7} = 1,
+and all others are unused.
 
 \section{F-1 Flight connections at a hub}
 
