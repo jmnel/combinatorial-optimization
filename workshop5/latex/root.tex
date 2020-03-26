@@ -1,0 +1,429 @@
+% ------------------
+% -- Assignment 1 --
+% -- Math 4171 -----
+
+\documentclass[11pt,oneside]{article}
+
+%\usepackage{subfigure}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{hyperref}
+\usepackage{adjustbox}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{mathrsfs}
+\usepackage[driver=pdftex]{geometry}
+\usepackage{import}
+%\usepackage{titleformat{\section
+%        {\normalfont\normalzie\bfseries}{Helo.}{1em}{}
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{proof}{Proof}
+ 
+\lstset{style=mystyle}
+
+%\usepackage[margin=0.5in]{geometry}
+\usepackage{inputenc}
+
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\Int}{\mathbb{Z}}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\Complex}{\mathbb{C}}
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+
+\renewcommand{\Re}[1]{\mathfrak{Re}\left\lbrace{#1}\right\rbrace}
+\renewcommand{\Im}[1]{\mathfrak{Im}\left\lbrace{#1}\right\rbrace}
+
+\DeclareMathOperator*{\minimize}{minimize}
+\DeclareMathOperator*{\maximize}{maximize}
+
+\title{{\bf LE/EECS 3172 3.0\\ Combinatorial Optimization}\\\vspace{10pt} \large Workshop 5     
+    \author{Jacques Nel}
+}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section{A-4 Cane sugar production}
+
+\begin{table}[h]
+    \center
+    \begin{tabular}{lccccccccccc}
+        \hline
+        \textbf{Lot} & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 \\
+        \hline
+        \textbf{Loss (kg/h)} & 43 & 26 & 37 & 28 & 13 & 54 & 62 & 49 & 19 & 28 & 30 \\
+            \textbf{Life span (h)} & 8 & 8 & 2 & 8 & 4 & 8 & 8 & 8 & 6 & 8 & 8 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Parameters}
+
+Let $W = \lbrace 0,\ldots, m-1\rbrace$ enumerate the wagons or lots. Let
+$S = \lbrace 0, \ldots, n-1\rbrace$ enumerate the time slots. Let $k=3$ denote
+the number of processing lines in the refinery, with $m=11$ and
+$n=\texttt{ceil}(m/k) = 4$.
+
+For $w\in W$ and $s\in S$, let $\Delta_{w}$ denote the hourly loss given in the
+table above for lot $w$. Let $l_{w}$ denote the life span of lot $w$. Let
+$d=2$ denote the time it takes to process one lot.
+
+\subsection{Decision variables}
+
+For $(w, s) \in W\times S$, let $x_{ws}\in\lbrace 0, 1\rbrace$ be a binary
+decision variable equal to 1 if lot $w$ is processed in slot $s$, and 0
+otherwise.
+
+\subsection{Model}
+
+We seek to minimize the loss in raw material resulting from fermentation due
+to delayed processing of a lot. The model is
+
+$$
+\minimize \sum_{w\in W}\sum_{s\in S} (s+1)d \Delta_w x_{ws},
+$$
+
+subject to the following constraints:
+
+$$
+\sum_{s\in S} x_{ws} = 1, \forall w \in W,
+$$
+$$
+\sum_{w\in W} x_{ws} \leq k, \forall s \in S,
+$$
+$$
+\sum_{s\in S} (s+1)x_{ws} \leq \frac{l_w}{d}, \forall w \in W.
+$$
+
+\subsection{Results}
+
+The optimal solution results in a loss of 1620 kg with the following
+time slot assignments:
+
+\begin{table}[h]
+    \center
+    \begin{tabular}{cccc}
+        \hline
+        \textbf{Slot 1} & \textbf{Slot 2} & \textbf{Slot 3} & \textbf{Slot 4} \\
+        \hline
+        lot 3   & lot 1 & lot 10 & lot 2 \\
+        lot 6   & lot 5 & lot 8 & lot 4 \\
+        lot 7   & lot 8 \\
+
+    \end{tabular}
+\end{table}
+
+\section{A-6 Production of electricity}
+
+\subsection{Parameters}
+
+Let $L=\left(l_0, \ldots, l_{n-1}\right)$ be the length of the time periods, and
+let $D=\left(d_0, \ldots, d_{n-1}\right)$ be the forecasted demand for each
+period. Let $T = \lbrace 0, \ldots, n-1\rbrace$ enumerate the time periods.
+Let $P=\lbrace 0, \ldots, m-1\rbrace$ with $m=4$ enumerate the types of generators.
+
+For a generator variant $p\in P$, a particular type has minimum base power output
+when it is running, along with a maximum output capacity. Let these parameters
+be denoted by $\phi_p$ and $\psi_p$ respectively. A generator also the following costs
+associated with it:
+
+$$
+\lambda_p : \textrm{startup cost}
+\quad\quad
+\mu_p : \textrm{running cost}
+\quad\quad
+\nu_p : \textrm{scalable additional cost}
+$$
+
+Lastly, the available number of each type of generator $p$ is denoted by $a_p$.
+
+\subsection{Decision variables}
+
+For $(p, t) \in P \times T$,
+
+$0 \leq i_{pt}\in\Nat$ : number of generators of type $p$ started in period $t$
+
+$0 \leq j_{pt}\in\Nat$ : number of generators of type $p$ running in period $t$
+
+$0 \leq q_{pt}\in\Real$ : additional scalable power output from generator $p$ in period $t$.
+
+\subsection{Model}
+
+The objective is to simply minimize total operating cost.
+
+$$
+\minimize \sum_{t\in T}\sum_{p\in P}
+\lambda_p i_{pt} + l_t\left( \mu_p j_{pt} + \nu_{p} q_{pt} \right),
+$$
+
+subject to the following constraints:
+
+$$
+i_{p0} \geq j_{p0} - j_{p(n-1)}, \forall p \in P
+$$
+$$
+i_{pt} \geq j{pt} - j_{p(t-1)}, \forall p \in P, 0 < t \in T
+$$
+$$
+q_{pt} \leq \left(\psi_p - \phi_p\right)j_{pt}, \forall (p, t) \in P\times T
+$$
+$$
+\sum_{p\in P} \phi_p j_{pt} + q_{pt} \geq d_t, \forall t \in T
+$$
+$$
+\sum_{p\in P} \psi_p j_{pt} \geq 1.2 d_t, \forall t \in T
+$$
+$$
+j_{pt} \leq a_{p}, \forall (p, t) \in P \times T
+$$
+$$
+i_{pt} \geq 0, j_{pt} \geq 0, q_{pt} \geq 0 
+$$
+
+\subsection{Results}
+
+The optimal solution was found with a total operating cost of \$1,456,810.
+
+\begin{table}[h]
+    \center
+\begin{tabular}{clrrrrrrr}
+    \hline
+    \textbf{Type} & & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} \\
+\hline
+    \textbf{1} & No. used & 3 & 4 & 4 & 7 & 3 & 3 & 3\\
+ & Tot. output & 2250 & 4600 & 3000 & 8600 & 2250 & 2600 & 2250\\
+ & Add. output & 0 & 1600 & 0 & 3350 & 0 & 350 & 0\\
+ \hline
+    \textbf{2} & No. used & 4 & 4 & 4 & 4 & 4 & 4 & 4\\
+ & Tot. output & 5750 & 6000 & 4200 & 6000 & 4950 & 6000 & 5950\\
+ & Add. output & 1750 & 2000 & 200 & 2000 & 950 & 2000 & 1950\\
+ \hline
+    \textbf{3} & No. used & 2 & 8 & 8 & 8 & 8 & 8 & 4\\
+ & Tot. output & 4000 & 16000 & 16000 & 16000 & 16000 & 16000 & 8000\\
+ & Add. output & 1600 & 6400 & 6400 & 6400 & 6400 & 6400 & 3200\\
+ \hline
+    \textbf{4} & No. used & 0 & 3 & 1 & 3 & 1 & 3 & 1\\
+ & Tot. output & 0 & 5400 & 1800 & 5400 & 1800 & 5400 & 1800\\
+ & Add. output & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+ \hline
+\end{tabular}
+\end{table}
+
+\section{C-2 Production of drinking glasses}
+
+\begin{table}[h]
+    \center
+    \caption{Demands for the planning periods (batches of 1000 glasses)}
+    \begin{tabular}{ccccccccccccc}
+        \hline
+        \textbf{Week} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{10} & \textbf{11} & \textbf{12} \\
+        \hline
+        \textbf{V1} & 20 & 22 & 18 & 35 & 17 & 19 & 23 & 20 & 29 & 30 & 28 & 32 \\
+        \textbf{V2} & 17 & 19 & 23 & 20 & 11 & 10 & 12 & 34 & 21 & 23 & 30 & 12 \\
+        \textbf{V3} & 18 & 35 & 17 & 10 & 9  & 21 & 23 & 15 & 10 & 0  & 13 & 17 \\
+        \textbf{V4} & 31 & 45 & 24 & 38 & 41 & 20 & 19 & 37 & 28 & 12 & 30 & 37 \\
+        \textbf{V5} & 23 & 20 & 23 & 15 & 10 & 22 & 18 & 30 & 28 & 7 & 15 & 10 \\
+        \textbf{V6} & 22 & 18 & 20 & 19 & 18 & 35 & 0  & 28 & 12 & 30 & 21 & 23 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[h]
+    \center
+    \caption{Data for the six glass types}
+    \begin{tabular}{cccccccc}
+        \hline
+        & prod. cost & store cost & init. stock & final stock & $W$ & $M$ & $S$ \\
+        \hline
+        \textbf{V1} & 100 & 25 & 50 & 10 & 3 & 2 & 4 \\
+        \textbf{V2} & 80 & 28 & 20 & 10 & 3 & 1 & 5 \\
+        \textbf{V3} & 110 & 25 & 0 & 10 & 3 & 4 & 5 \\
+        \textbf{V4} & 90 & 27 & 15 & 10 & 2 & 8 & 6 \\
+        \textbf{V5} & 200 & 10 & 0 & 10 & 4 & 11 & 4 \\
+        \textbf{V6} & 150 & 20 & 10 & 10 & 4 & 9 & 9 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Parameters}
+
+Let $n=12$ and $m=6$ denote the number of planning periods and number of product
+variants respectively. Let $W=\lbrace 0,\ldots,n-1\rbrace$ enumerate the planning
+periods. Let $P=\lbrace 0,\ldots, m-1\rbrace$ enumerate the different products.
+
+For $p\in P$ and $w\in W$, let
+
+$d_{pw}$ : demand for product $p$ in week $w$,
+
+$\lambda_{p}$ : production cost for each product,
+
+$\mu_{p}$ : storage cost for each product,
+
+$I_{p}$ : initial stock for each each product at start,
+
+$F_{p}$ : final stock requirement for each product at end,
+
+$\delta_p$ : worker time cost required per product,
+
+$\pi_p$ : machine time cost required per product,
+
+$\lambda_p$ : storage area required for production,
+
+$\Delta = 390$ : available worker time capacity,
+
+$\Pi = 850$ : available machine time capacity,
+
+$\Lambda = 1000$ : available production storage area.
+
+\subsection{Decision variables}
+
+Let $0 \leq x_{pw} \in \Int$ denote the quanitity of production of product
+$p$ in period $w$. Let $0 \leq y_{pw} \in \Int$ denote the storage of product
+$p$ in period $w$.
+
+\subsection{Model}
+
+The objective is simply the total production cost, which we seek to minimize.
+
+$$
+\minimize \sum_{p\in P}\sum_{t \in T}
+\lambda_p x_{pw} + \mu_p y_{pw}
+$$
+
+Subject to the following constraints:
+
+\begin{eqnarray}
+y_{p0} = I_p + x_{p0} - d_{p0}, \forall p \in P, \\
+y_{pt} = y_{p(t-1)} + x_{pt} - d_{pt}, \forall p \in T \text{ and } 0 < t \in T \\
+y_{p(n-1)} \geq F_p, \forall p \in P \\
+\sum_{p\in P} \delta_p x_{pt} \leq \Delta, \forall t \in T\\
+\sum_{p\in P} \pi_p x_{pt} \leq \Pi, \forall t \in T \\
+\sum_{p\in P} \lambda_p x_{pt} \leq \Lambda, \forall t  \in T\\
+x_{pt} \geq 0, y_{pt} \geq 0, \forall (p, t) \in P\times T
+\end{eqnarray}
+
+\subsection{Results}
+
+A optimal solution is found with a total production cost of \$186,076.
+
+\begin{table}[h]
+    \center
+    \caption{Production and storage quantities for each product type}
+\begin{tabular}{cccccccccccccc}
+    \hline
+    & \textbf{Week} & \textbf{1} &\textbf{2} &\textbf{3} &\textbf{4} &\textbf{5} &\textbf{6} &\textbf{7} &\textbf{8} &\textbf{9} &\textbf{10} &\textbf{11} &\textbf{12} \\
+    \hline
+    \textbf{1} & Prod. & 0 & 0 & 11 & 34 & 29 & 7 & 23 & 21 & 29 & 29 & 29 & 41\\
+& Store & 30 & 8 & 1 & 0 & 12 & 0 & 0 & 1 & 1 & 0 & 1 & 10\\
+\textbf{2} & Prod. & 7 & 21 & 14 & 17 & 11 & 10 & 12 & 34 & 21 & 23 & 30 & 22\\
+& Store & 10 & 12 & 3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 10\\
+\textbf{3} & Prod. & 18 & 35 & 17 & 11 & 8 & 21 & 23 & 15 & 10 & 0 & 13 & 27\\
+& Store & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 10\\
+\textbf{4} & Prod. & 16 & 45 & 24 & 38 & 41 & 20 & 20 & 36 & 29 & 11 & 31 & 46\\
+& Store & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 & 1 & 10\\
+\textbf{5} & Prod. & 47 & 16 & 34 & 14 & 23 & 24 & 43 & 0 & 26 & 4 & 0 & 0\\
+& Store & 24 & 20 & 31 & 30 & 43 & 45 & 70 & 40 & 38 & 35 & 20 & 10\\
+\textbf{6} & Prod. & 14 & 17 & 20 & 18 & 18 & 35 & 1 & 27 & 12 & 49 & 28 & 7\\
+& Store & 2 & 1 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 19 & 26 & 10\\
+\hline
+\end{tabular}
+\end{table}
+
+\emph{Note:} I choose to solve this as an integer programming model. This is
+the reason why my results differ slightly from the book.
+
+\section{D-5 Cutting sheet metal}
+
+
+
+\section{F-1 Flight connections at a hub}
+
+\subsection{Parameters}
+
+Let $P = \lbrace 0, \ldots n-1\rbrace$ enumerate all the set of incoming flights
+with $n=6$. $P$ enumerates both origins of incoming flights and flights to
+destinations, since the number of aircraft is fixed.
+
+Let $p_{ij}$ denote the number of passengers arriving from $i$ and having final
+destination $j$.
+
+\subsection{Decision variables}
+
+Let $x_{ij}\in \lbrace 0, 1\rbrace$ be a binary variable, indicating plane
+from city $i$ will depart to city $j$ next when 1.
+
+\subsection{Model}
+
+We simply wish to maximize the number of passengers that do not have to disembark
+and transfer to another aircraft. Our objective function is
+
+$$
+\maximize \sum_{i\in P}\sum_{j\in P} p_{ij}x_{ij}
+$$
+
+subject to the following constraints:
+
+$$
+\sum_{j\in P}p_{ij} x_{ij} = 1, \forall i\in P
+$$
+$$
+\sum_{i\in P}p_{ij} x_{ij} = 1, \forall j\in P
+$$
+
+\subsection{Results}
+
+The optimal solution has a value of $112$ for its objective function.
+
+The following assignment of aircraft to destination, minimizes passenger
+inconvenience:
+
+Bordeaux $\rightarrow$ London 38
+
+Clermon-Ferrand $\rightarrow$ Bern 8
+
+Marseille $\rightarrow$ Brussels 11
+
+Nantes $\rightarrow$ Berlin 38
+
+Nice $\rightarrow$ Rome 10
+
+Toulouse $\rightarrow$ Vienna 7
+
+
+
+
+\end{document}
