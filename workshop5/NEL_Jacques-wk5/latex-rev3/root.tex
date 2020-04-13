@@ -1,0 +1,595 @@
+\documentclass[8pt,oneside]{extarticle}
+
+%\usepackage{subfigure}
+\usepackage{subcaption}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{hyperref}
+\usepackage{adjustbox}
+\usepackage{listings}
+\usepackage{optidef}
+\usepackage{cleveref}
+\usepackage{threeparttable}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{mathrsfs}
+\usepackage[driver=pdftex]{geometry}
+\usepackage{import}
+%\usepackage{titleformat{\section
+%        {\normalfont\normalzie\bfseries}{Helo.}{1em}{}
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\crefname{table}{table}{table}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0.7em}
+
+\counterwithin{table}{section}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{proof}{Proof}
+ 
+\lstset{style=mystyle}
+
+%\usepackage[margin=0.5in]{geometry}
+\usepackage{inputenc}
+
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\Int}{\mathbb{Z}}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\Complex}{\mathbb{C}}
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+
+%\renewcommand{\TPTminimum}{\textwidth}
+
+\renewcommand{\Re}[1]{\mathfrak{Re}\left\lbrace{#1}\right\rbrace}
+\renewcommand{\Im}[1]{\mathfrak{Im}\left\lbrace{#1}\right\rbrace}
+
+%\DeclareMathOperator*{\minimize}{minimize}
+%\DeclareMathOperator*{\maximize}{maximize}
+
+\title{{\bf MATH 3172 3.0\\ Combinatorial Optimization}\\\vspace{10pt} \large Workshop 5     
+    \author{Jacques Nel}
+}
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{empty}
+
+\newpage
+
+\pagenumbering{arabic}
+
+\section*{A quick note about revision:}
+
+This is the $3^\mathrm{rd}$ revision of this assignment.
+
+\newpage
+
+
+\section{A-4 Cane sugar production}
+
+This problem is taken from\footnote{C. Guéret, C. Prins, M. Sevaux, \textit{Applications of optimization with Xpress-MP}. %
+Paris: Dash Optimization Ltd., 2007. Page 74.}.
+
+\subsection{Parameters}
+
+Let $W = \left\lbrace 1,\ldots, m\right\rbrace$ enumerate $m=11$ wagons or lots, and 
+$S=\left\lbrace 1, \ldots, n\right\rbrace$ enumerate $n$ time slots. The refinery has $k=3$ equivalent processing lines.
+$n$ timeslots are required to process $m$ wagons where $n$ is given by $n=\texttt{ceil}(m/k)=4$. 
+Each lot $w\in W$ has an associated hourly loss $\Delta_w$ and remaining lifespan $l_w$ until total loss.
+Furthermore, a single lot takes $D=2$ hours to process on any given production line.
+
+\subsection{Decision variable}
+
+Let $\vect{x} = \left[ x_{ws}\right] \in \left\lbrace 0, 1\right\rbrace^{m\times n}$
+where for $w\in W$ and $s\in S$,
+
+$$x_{ws} = \begin{cases}
+    1 & \text{lot }w\text{ is processed in slot }s\\
+    0 & \text{otherwise}
+\end{cases}.
+$$
+\subsection{Model}
+
+We seek to minimize the loss in raw material resulting from fermentation due
+to delayed processing of a lot. The model is
+
+\begin{mini!}
+    {\vect{x}}{f\left(\vect{x}\right)=\sum_{w\in W}\sum_{s\in S} sd\Delta_{w}x_{ws} \protect\label{eq:a4-obj}}{\label{eq:a4}}{}
+    \addConstraint{\sum_{s\in S}x_{ws}}{=1, \forall w\in W \protect\label{eq:a4-cstr1}}
+    \addConstraint{\sum_{w\in W}x_{ws}}{\leq k, \forall s\in S \protect\label{eq:a4-cstr2}}
+    \addConstraint{\sum_{s\in S}sx_{ws}}{\leq l_w / d, \forall w\in W \protect\label{eq:a4-cstr3}}
+\end{mini!}
+
+The objective function \cref{eq:a4-obj} is the total loss in raw material resulting from delayed processing
+summed over all lots and wagons. All lots must be assigned to exactly one slot as enforced by \cref{eq:a4-cstr1}.
+Next, \cref{eq:a4-cstr2} guarantees that at most $k=3$ lots can be processed in any one timeslot. Finally,
+\cref{eq:a4-cstr3} ensures that a lot is processed before its total loss occurs. Observe that total loss of a lot
+occurs after $l_w / d$ slots.
+
+\newpage
+
+\subsection{Results}
+
+The optimal solution results in a loss of $f\left(\vect{x}^*\right) = 1620$ kg with the following
+time slot assignments:
+
+\begin{table}[h]
+    \centering
+    \caption{Optimal time slot allocations for each lot}\label{table:a4-results}
+    \begin{tabular}{cccc}
+        \hline
+        \textbf{Slot 1} & \textbf{Slot 2} & \textbf{Slot 3} & \textbf{Slot 4} \\
+        \hline
+        lot 3   & lot 1 & lot 10 & lot 2 \\
+        lot 6   & lot 5 & lot 8 & lot 4 \\
+        lot 7   & lot 8 & &\\
+        \hline
+
+    \end{tabular}
+
+    \medskip
+    \emph{Note:} Column $j$ is generated with $\left\lbrace w : x_{wj} = 1, \forall w \in
+            \mathrm{W}\right\rbrace$.
+\end{table}
+
+\section{A-6 Production of electricity}
+
+This problem is taken from\footnote{C. Guéret, C. Prins, M. Sevaux, \textit{Applications of optimization with Xpress-MP}. %
+Paris: Dash Optimization Ltd., 2007. Page 78.}.
+
+\subsection{Parameters}
+
+Let $T=\lbrace 1,\ldots, n\rbrace$ enumerate $n=7$ time periods (of varying length) and $P=\lbrace 1,\ldots, m\rbrace$ enumerate
+$m=4$ generator types. For a time period $t\in T$ let $l_t$
+denote the length of time period in hours, and
+let $d_t$ denote the forecasted power demand given by $d_t$.
+
+\begin{table}[h]
+    \center
+    \caption{Length and forecasted demand of time periods}\label{table:a6-periods}
+    \begin{tabular}{c c c}
+        \hline
+        \textbf{Period} $t$ & \textbf{Length} $l_t$ & \textbf{Demand} $d_t$ \\
+        \hline
+        1 & 6 & $1.2 \times 10^4$ \\
+        2 & 3 & $3.2 \times 10^4$ \\
+        3 & 3 & $2.5 \times 10^4$ \\
+        4 & 2 & $3.6 \times 10^4$ \\
+        5 & 4 & $2.5 \times 10^4$ \\
+        6 & 4 & $3.0 \times 10^4$ \\
+        7 & 2 & $1.8 \times 10^4$ \\
+        \hline
+    \end{tabular}
+\end{table}
+
+For each generator type $p\in P$, there are $a_p$ units available. Each unit has
+a minimum base power output $\theta_p$ (if it is running) and can scale up to a
+maximum output denoted $\psi_p$, but incurring additional operating cost.
+
+\begin{table}[h]
+    \center
+    \caption{Number of available units and power output capacity}\label{table:a6-generators}
+    \begin{tabular}{cccc}
+        \hline
+        \textbf{Type} & \textbf{Num. available} $a_p$ & \textbf{Min. output} $\theta_p$ & \textbf{Max output} $\psi_p$ \\
+        \hline
+        1 & 10 & $7.5\times 10^2$ & $1.75\times 10^3$ \\
+        2 & 4 & $1.0\times 10^3$ & $1.5\times 10^3$ \\
+        3 & 8 & $1.2\times 10^3$ & $2.0\times 10^3$ \\
+        4 & 3 & $1.8\times 10^3$ & $3.5\times 10^3$ \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\newpage
+
+Starting a generator unit of type $p\in P$ incurs a startup cost $\lambda_p$. Running the generator
+incurs a fixed cost per hour $\mu_p$. Additional scalable output, on top of
+the base output, incurs a hourly cost $\nu_p$ that is proportional to the additional output.
+
+\begin{figure}[h]
+    \protect\label{fig:a6-costs}
+    \center
+    \caption{Various costs associated with generator types}
+    \begin{tabular}{cccc}
+        \hline
+        \textbf{Type} & \textbf{Start cost} $\lambda_p$ & \textbf{Run cost} $\mu_p$ & \textbf{Add. cost} $\nu_p$ \\
+        \hline
+        1 & 5000 & 2250 & 2.7 \\
+        2 & 1600 & 1800 & 2.2 \\
+        3 & 2400 & 3750 & 1.8 \\
+        4 & 1200 & 4800 & 3.8 \\
+        \hline
+    \end{tabular}
+\end{figure}
+
+
+\subsection{Decision variables}
+
+Suppose $p\in P$ and $t\in T$. Let
+$0 \leq x_{pt} \in\Int$ denote the number of generators of type $p$ started in
+period $t$, and
+$0 \leq y_{pt} \in\Int$ be the number of generators of type $p$ running in
+period $t$. Finally, let $0 \leq z_{pt}\in\Real$ denote the additional power generated by unit of type $p$ during
+period $t$. 
+
+To simplify notation, let $\vect{x} = \left[x_{pt}\right] \in
+\Int^{m\times n}, \vect{y} = \left[y_{pt}\right] \in \Int^{m\times n}$,
+and $\vect{z} = \left[z_{pt}\right] \in \Real^{m\times n}$.
+
+\subsection{Model}
+
+\begin{mini!}
+    {\vect{x}, \vect{y}, \vect{z}}{\sum_{t\in T}\sum_{p\in P} \lambda_{p}x_{pt} + l_t\left(\mu_p y_{pt} + \nu_p z_{pt}\right) \protect\label{eq:a6-obj}}{\label{eq:a6}}{}
+    \addConstraint{x_{p1}}{\geq y_{p1} - y_{pn}, \forall p\in P \protect\label{eq:a6-cstr1}}
+    \addConstraint{x_{pt}}{\geq y_{pt} - y_{p(t-1)}, \forall p\in P, 1 < t\in T \protect\label{eq:a6-cstr2}}
+    \addConstraint{z_{pt}}{\leq \left(\psi_p - \theta_p\right)y_{pt}, \forall (p, t)\in P\times T \protect\label{eq:a6-cstr3}}
+    \addConstraint{\sum_{p\in P} \theta_p y_{pt} + z_{pt}}{\geq d_t, \forall t\in T \protect\label{eq:a6-cstr4}}
+    \addConstraint{\sum_{p\in P} \psi_p y_{pt}}{\geq 1.2 d_t, \forall t\in T \protect\label{eq:a6-cstr5}}
+    \addConstraint{y_{pt}}{\leq a_p, \forall (p,t)\in P\times T \protect\label{eq:a6-cstr6}}
+    \addConstraint{x_{pt}}{\geq 0, \forall (p,t)\in P\times T \protect\label{eq:a6-cstr7}}
+    \addConstraint{y_{pt}}{\geq 0, \forall (p,t)\in P\times T \protect\label{eq:a6-cstr8}}
+    \addConstraint{z_{pt}}{\geq 0, \forall (p,t)\in P\times T \protect\label{eq:a6-cstr9}}
+\end{mini!}
+
+The cost function \cref{eq:a6-obj} is simply the startup cost, running cost, and
+additional power cost summed over all decision variables. The number of generators started
+for $t=1$ is related to the number of generators running by \cref{eq:a6-cstr1}. This relationship
+depends on the numbers generators running at the end period $t=n$. The next family of 
+constraints \cref{eq:a6-cstr2} is similar to the above, but deals with the relationship
+for $1< t \leq n$.
+
+Additional power output $z_{pt}$ is bounded by the difference between the maximum and
+the base output, ie. $\psi_p - \theta_p$, as expressed
+by \cref{eq:a6-cstr3}. Next, \cref{eq:a6-cstr4} ensures that the total ouput of all
+generator units meets forecasted demand $d_t$ for all $t\in T$. Furthermore, a $20\%$
+safety buffer is required at all times. \Cref{eq:a6-cstr5} ensures that, if demand
+were to suddenly spike, a minimum of $20\%$ of $d_t$ of additional capacity can instantly be 
+made available, by increasing additional output $z_{pt}$ up its maximum $\psi_p-\theta_p$.
+
+The family of constraints \cref{eq:a6-cstr6} simply places an upper bound on the number
+of units running, in a given period, equal to the given available number of units
+$a_p$ of each type. Finally, \cref{eq:a6-cstr7}, \cref{eq:a6-cstr8}, and
+\cref{eq:a6-cstr9} simply enforce the canonical non-negativity of $x_{pt}$, $y_{pt}$, and $z_{pt}$
+respectively.
+
+\subsection{Results}
+
+The optimal solution was found with a total operating cost of
+$f\left(\vect{x}^*, \vect{y}^*, \vect{z}^*\right) = \$1,456,810$.
+
+\begin{table}[ht]
+    \centering
+    \caption{Optimal power generation schedule for 4 generator types over 7 planning periods}
+\begin{tabular}{clrrrrrrr}
+    \hline
+    \textbf{Type} & & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} \\
+\hline
+    \textbf{1} & No. used & 3 & 4 & 4 & 7 & 3 & 3 & 3\\
+ & Tot. output & 2250 & 4600 & 3000 & 8600 & 2250 & 2600 & 2250\\
+ & Add. output & 0 & 1600 & 0 & 3350 & 0 & 350 & 0\\
+ \hline
+    \textbf{2} & No. used & 4 & 4 & 4 & 4 & 4 & 4 & 4\\
+ & Tot. output & 5750 & 6000 & 4200 & 6000 & 4950 & 6000 & 5950\\
+ & Add. output & 1750 & 2000 & 200 & 2000 & 950 & 2000 & 1950\\
+ \hline
+    \textbf{3} & No. used & 2 & 8 & 8 & 8 & 8 & 8 & 4\\
+ & Tot. output & 4000 & 16000 & 16000 & 16000 & 16000 & 16000 & 8000\\
+ & Add. output & 1600 & 6400 & 6400 & 6400 & 6400 & 6400 & 3200\\
+ \hline
+    \textbf{4} & No. used & 0 & 3 & 1 & 3 & 1 & 3 & 1\\
+ & Tot. output & 0 & 5400 & 1800 & 5400 & 1800 & 5400 & 1800\\
+ & Add. output & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+ \hline
+\end{tabular}
+
+\medskip
+\emph{Note:} The above table was generated from the solution values $x_{pt}^*, 
+y_{pt}^*$, and $z_{pt}^*$ with \texttt{a-6\_report.py}.
+\end{table}
+
+\section{C-2 Production of drinking glasses}
+
+This problem is taken from\footnote{C. Guéret, C. Prins, M. Sevaux, \textit{Applications of optimization with Xpress-MP}. %
+Paris: Dash Optimization Ltd., 2007. Page 106.}.
+
+\subsection{Parameters}
+
+Let $W =\left\lbrace 1,\ldots, n\right\rbrace$ enumerate $n=12$ week-long planning
+periods, and let $P=\left\lbrace 1,\ldots, m\right\rbrace$ enumerate the $m=6$
+product variants. Each product $p\in P$ has a predicted demand $d_{pt}$ during week
+$t\in W$ as given in \cref{table:c2-demands}.
+
+\begin{table}[h]
+    \center
+    \caption{Predicted weekly demand for each product variant}\label{table:c2-demands}
+    \begin{tabular}{c cccccccccccc}
+        \hline
+        \textbf{Week} & \textbf{1} &\textbf{2} &\textbf{3} &\textbf{4} &\textbf{5} &\textbf{6} &\textbf{7} &\textbf{8} &\textbf{9} &\textbf{10} &\textbf{11} &\textbf{12} \\
+        \hline
+        \textbf{V1} & 20 & 22 & 18 & 35 & 17 & 19 & 23 & 20 & 29 & 30 & 28 & 32 \\
+        \textbf{V2} & 17 & 19 & 23 & 20 & 11 & 10 & 12 & 34 & 21 & 23 & 30 & 12 \\
+        \textbf{V3} & 18 & 35 & 17 & 10 & 9  & 21 & 23 & 15 & 10 & 0 & 13 & 17 \\
+        \textbf{V4} & 31 & 45 & 24 & 38 & 41 & 20 & 19 & 37 & 28 & 12 & 30 & 37 \\
+        \textbf{V5} & 23 & 20 & 23 & 15 & 10 & 22 & 18 & 30 & 28 & 7 & 15 & 10 \\
+        \textbf{V6} & 22 & 18 & 20 & 19 & 18 & 35 & 0 & 28 & 12 & 30 & 21 & 23 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Each product variant $p\in P$ has an associated basic production cost $\lambda_p$
+and an inventory storage cost $\mu_p$ incurred on product in inventory over
+given period. Production requires a known amount worker labour time $\delta_p$,
+machine time $\pi_p$, and production area $\gamma_p$. In every period there
+is a limited amount of worker time $\Delta$, available machine time $\Pi$, and
+production area $\Gamma$. Lastly, at the start of planning period there exists volume 
+$I_p$ of item $p$ in the inventory, and it is required that there is $F_p$ of item
+$p$ at the end of the planning period in the inventory. All parameters are given in
+\cref{table:c2-params}.
+
+\begin{table}[h]
+    \center
+    \caption{Given costs, production resources, and inventory of product variants}
+    \label{table:c2-params}
+    \begin{tabular}{cccccccc}
+        \hline
+        & \textbf{prod. cost} & \textbf{inv. cost}  & 
+        \textbf{init. stock}  & \textbf{fin. stock}  & 
+        \textbf{labour}  & \textbf{mach. time}  & 
+        \textbf{area} \\
+        \hline
+        \textbf{V1} & 100 & 25 & 50 & 10 & 3 & 2 & 4 \\
+        \textbf{V2} & 80 & 28 & 20 & 10 & 3 & 1 & 5 \\
+        \textbf{V3} & 110 & 25 & 0 & 10 & 3 & 4 & 5 \\
+        \textbf{V4} & 90 & 27 & 15 & 10 & 2 & 8 & 6 \\
+        \textbf{V5} & 200 & 10 & 0 & 10 & 4 & 11 & 4 \\
+        \textbf{V6} & 150 & 20 & 10 & 10 & 4 & 9 & 9 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\newpage
+
+\subsection{Decision variables}
+
+For a given product $p\in P$ and week $t\in W$ let
+$0 \leq x_{pt} \in\Int$ denote the production volume. 
+Also let $0\leq y_{pt}\in\Int$ denote the amount of product stored in the inventory
+at the end of period $t$. 
+
+To simplify notation let $\vect{x} = \left[ x_{pt} \right] \in \Int^{m\times x}$
+and $\vect{y} = \left[ y_{pt} \right] \in \Int^{m\times x}$.
+
+\subsection{Model}
+
+\begin{mini!}
+    {\vect{x}, \vect{y}}{f\left(\vect{x}, \vect{y}\right)=\sum_{p\in P}\sum_{t\in W} \lambda_p x_{pt} + \mu_p y_{pt} \protect\label{eq:c2-obj}}{\label{eq:c2}}{}
+    \addConstraint{y_{p1}}{= I_p + x_{pt} - d_{pt}, \forall p\in P \protect\label{eq:c2-cstr1}}
+    \addConstraint{y_{pt}}{= y_{p(t-1)} + x_{pt} - d_{pt}, \forall p\in P, t\in W \protect\label{eq:c2-cstr2}}
+    \addConstraint{y_{pn}}{= F_p, \forall p\in P, \protect\label{eq:c2-cstr3}}
+    \addConstraint{\sum_{p\in P} \delta_p x_{pt}}{\leq \Delta, \forall t\in W, \protect\label{eq:c2-cstr4}}
+    \addConstraint{\sum_{p\in P} \pi_p x_{pt}}{\leq \Pi, \forall t\in W, \protect\label{eq:c2-cstr5}}
+    \addConstraint{\sum_{p\in P} \gamma_p x_{pt}}{\leq \Gamma, \forall t\in W, \protect\label{eq:c2-cstr6}}
+    \addConstraint{x_{pt}}{\geq 0 \forall p\in P, t\in W, \protect\label{eq:c2-cstr7}}
+    \addConstraint{y_{pt}}{\geq 0 \forall p\in P, t\in W, \protect\label{eq:c2-cstr8}}
+\end{mini!}
+
+We seek to minimize total production cost. \Cref{eq:c2-obj} is a cost function which simply sums the total production and storage
+costs over all decision variables.
+
+\Cref{eq:c2-cstr1} and \cref{eq:c2-cstr2} states that the inventory at time $t$ is
+equal the previous inventory plus the product minus the demand. \Cref{eq:c2-cstr1}
+makes special consideration for the initial inventory $I_p$. \Cref{eq:c2-cstr3}
+ensures that the final inventory for product $p$ is equal to $F_p$ at the end of the
+planning period.
+
+\Cref{eq:c2-cstr4}, \cref{eq:c2-cstr5} and \cref{eq:c2-cstr6} ensures that limited
+production factors: worker time capacity $\Delta$, machine time capacity 
+$\Pi$, and production area $\Gamma$ constraints are respected. For example,
+production of product $p$ during period $t$ requires $\pi_p x_{pt}$ machine hours, the total
+of which shall not exceed $\Pi$ for the given period.
+
+Lastly \cref{eq:c2-cstr7} and \cref{eq:c2-cstr8} are simply the cononical non-negativity
+constraints on both decision variables $x_{pt}$ and $y_{pt}$.
+
+\newpage
+
+\subsection{Results}
+
+A optimal solution $\left(\vect{x}^*, \vect{t}^*\right)$ is found with a total 
+production cost of $f\left(\vect{x}^*, \vect{y}^*\right) = \$186,076$.
+
+\begin{table}[h]
+    \center
+    \caption{Production and storage quantities for each product type}
+\begin{tabular}{cccccccccccccc}
+    \hline
+    & \textbf{Week} & \textbf{1} &\textbf{2} &\textbf{3} &\textbf{4} &\textbf{5} &\textbf{6} &\textbf{7} &\textbf{8} &\textbf{9} &\textbf{10} &\textbf{11} &\textbf{12} \\
+    \hline
+    \textbf{1} & Prod. & 0 & 0 & 11 & 34 & 29 & 7 & 23 & 21 & 29 & 29 & 29 & 41\\
+& Store & 30 & 8 & 1 & 0 & 12 & 0 & 0 & 1 & 1 & 0 & 1 & 10\\
+\textbf{2} & Prod. & 7 & 21 & 14 & 17 & 11 & 10 & 12 & 34 & 21 & 23 & 30 & 22\\
+& Store & 10 & 12 & 3 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 10\\
+\textbf{3} & Prod. & 18 & 35 & 17 & 11 & 8 & 21 & 23 & 15 & 10 & 0 & 13 & 27\\
+& Store & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 10\\
+\textbf{4} & Prod. & 16 & 45 & 24 & 38 & 41 & 20 & 20 & 36 & 29 & 11 & 31 & 46\\
+& Store & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 1 & 0 & 1 & 10\\
+\textbf{5} & Prod. & 47 & 16 & 34 & 14 & 23 & 24 & 43 & 0 & 26 & 4 & 0 & 0\\
+& Store & 24 & 20 & 31 & 30 & 43 & 45 & 70 & 40 & 38 & 35 & 20 & 10\\
+\textbf{6} & Prod. & 14 & 17 & 20 & 18 & 18 & 35 & 1 & 27 & 12 & 49 & 28 & 7\\
+& Store & 2 & 1 & 1 & 0 & 0 & 0 & 1 & 0 & 0 & 19 & 26 & 10\\
+\hline
+\end{tabular}
+\end{table}
+
+\emph{Note:} I choose to solve this as an integer programming model. This is
+the reason why my results differ slightly from the book. The above table simply states the optimal
+solution values for $x_{pt}^*$ and $y_{pt}^*$ for all $p\in P$ and $t\in W$.
+
+\section{D-5 Cutting sheet metal}
+
+This problem is taken from\footnote{C. Guéret, C. Prins, M. Sevaux, \textit{Applications of optimization with Xpress-MP}. %
+Paris: Dash Optimization Ltd., 2007. Page 134.}.
+
+\subsection{Parameters}
+
+Let $S =\left\lbrace 1, \ldots, n\right\rbrace$ enumerate $n=4$ different sizes, ie.
+$\left\lbrace \texttt{36x50}, \texttt{24x36}, \texttt{20x60}, \texttt{18x30}\right\rbrace$.
+Also, let $P=\left\lbrace 1,\ldots, m\right\rbrace$ enumerate $m$ different cutting patterns.
+For $s\in S$ and $p\in P$ let $c_{sp}$ denote number of pieces of size $s$ yielded
+by pattern $p$. The values of $c_{sp}$ are given by \cref{table:d5-yield}.
+
+\begin{table}[h]
+    \center
+    \caption{Yields of various cutting patterns}\label{table:d5-yield}
+    \begin{tabular}{ccccccccccccccccc}
+        \hline
+        \textbf{Pattern} & \textbf{1} & \textbf{2} &\textbf{3} &\textbf{4} &\textbf{5}&\textbf{6}&\textbf{7}&\textbf{8}&\textbf{9}&\textbf{10}&\textbf{11}&\textbf{12}&\textbf{13}&\textbf{14}&\textbf{15}&\textbf{16} \\
+        \hline
+        \texttt{36x50} & 1 & 1 & 1 & 0 & 0 & 0 &0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        \texttt{24x36} & 2 & 1 & 0 & 2 & 1 & 0 & 3 & 2 & 1 & 0 & 5 & 4 & 3 & 2 & 1 & 0 \\
+        \texttt{20x60} & 0 & 0 & 0 & 2 & 2 & 2 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
+        \texttt{18x30} & 0 & 1 & 3 & 0 & 1 & 3 & 0 & 2 & 3 & 5 & 0 & 1 & 3 & 5 & 6 & 8 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Each cut size $s\in S$ has a given demand $\vect{d} =\left( d_s : s \in S\right)^T
+= \left( 8, 13, 5, 15\right)^T$. Finaly, each pattern has equivalent cost $\kappa = 1$,
+or simply the cost of each sheet of raw material.
+
+\subsection{Decision variable}
+
+Let $0 \leq x_{p} \in \Int$ denote the number of times pattern $p$ is used. To simplify
+notation let $\vect{x} = \left( x_p : p \in P\right)$.
+
+\subsection{Model}
+
+\begin{mini!}
+    {\vect{x}}{f(\vect{x}) = \sum_{p\in P} x_p\kappa \protect\label{eq:d5-obj}}{\label{eq:d5}}{}
+    \addConstraint{\sum_{p\in P} c_{sp} x_p}{\geq d_s, \forall s\in S \protect\label{eq:d5-cstr1}}
+    \addConstraint{x_p}{\geq 0, \forall p\in P \protect\label{eq:d5-cstr2}}
+\end{mini!}
+
+We seek to minimize the total cost which is given by \cref{eq:d5-obj}. This is simply
+the total number of sheets of raw material used. \Cref{eq:d5-cstr1} is the family
+of demand constraints, which guarantee that demand is met for each size $s\in S$.
+Finaly \cref{eq:d5-cstr2} is simply the canonical non-negativity constraint on
+the decision variable $x_p$.
+
+\subsection{Results}
+
+An optimal solution is found which uses 11 sheets of raw material to satisfy
+demand, with a cost function value of $f\left(\vect{x}^*\right)= 11$. The following quantities of each pattern
+are used:
+
+\texttt{pattern 1} = 3,
+\texttt{pattern 3} = 5,
+\texttt{pattern 4} = 2,
+\texttt{pattern 7} = 1,
+and all others are unused. These values are simply the optimal non-zero values of the decision variable
+$x_p^*, \forall p\in\mathrm{P}$.
+
+\section{F-1 Flight connections at a hub}
+
+This problem is taken from\footnote{C. Guéret, C. Prins, M. Sevaux, \textit{Applications of optimization with Xpress-MP}. %
+Paris: Dash Optimization Ltd., 2007. Page 157.}.
+
+\subsection{Parameters}
+
+Let $P = \left\lbrace 1, \ldots, n\right\rbrace$ enumerate both $n=6$ incoming flights
+and then $n$ outgoing flights. For $i\in P$ and $j\in P$, let $\mu_{ij}$ denote
+the number of passengers arriving on flight $i$ from origin $i$ seeking to continue
+on to destination $j$ given by \cref{table:f1-passengers}.
+
+\begin{table}[h]
+    \center
+    \caption{Arriving passengers and destinations}\label{table:f1-passengers}
+    \begin{tabular}{c|cccccc}
+        \hline
+        \textbf{City} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} \\
+        \textbf{1} & 35 & 12 & 16 & 38 & 5 & 2 \\ 
+        \textbf{2} & 25 & 8 & 9 & 24 & 6 & 8 \\
+        \textbf{3} & 12 & 8 & 11 & 27 & 3 & 2 \\
+        \textbf{4} & 38 & 15 & 14 & 30 & 2 & 9 \\
+        \textbf{5} & - & 9 &   8 & 25 &  10 & 5 \\
+        \textbf{6} & - & - & - & 14 &  6 & 7 \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Decision variable}
+
+Let $x_{ij} \in\lbrace 0, 1\rbrace$ indicate that aircraft
+    from origin $i\in P$ travels to destination $j\in P$ for next flight when
+    $x_{ij} = 1$. To simplify notation let $\vect{x} = \left[x_{ij}\right]
+    \in \left\lbrace 0, 1\right\rbrace^{n\times n}$.
+
+\subsection{Model}
+
+We seek to minimize the number of passengers requiring to disembark and transfer to another plane for their
+next flight. In other words, we wish to maximize the number of passengers staying on their arriving aircraft.
+
+\begin{mini!}
+    {\vect{x}}{f(\vect{x}) = \sum_{i\in P} \sum_{j\in P} \mu_{ij}x_{ij} \protect\label{eq:f1-obj}}{\label{eq:f1}}{}
+    \addConstraint{\sum_{j\in P} \mu_{ij}x_{ij}}{= 1, \forall i\in P \protect\label{eq:f1-cstr1}}
+    \addConstraint{\sum_{i\in P} \mu_{ij}x_{ij}}{= 1, \forall j\in P. \protect\label{eq:f1-cstr2}}
+\end{mini!}
+
+\subsection{Results}
+
+The optimal solution has a total of $f\left(\vect{x}^*\right)= 112$ passengers remaining on their arrival flights for the
+remainder of their journeys. The following assignment of aircraft to destination, minimizes passenger
+inconvenience:
+\medskip
+
+Bordeaux $\rightarrow$ London 38
+
+Clermon-Ferrand $\rightarrow$ Bern 8
+
+Marseille $\rightarrow$ Brussels 11
+
+Nantes $\rightarrow$ Berlin 38
+
+Nice $\rightarrow$ Rome 10
+
+Toulouse $\rightarrow$ Vienna 7
+
+\medskip
+\emph{Note:} The above mapping is simply constructed by the permutation matrix given by $\vect{x}^*$.
+
+Refer to \texttt{f-1\_report.py}
+for implementation details.
+
+\end{document}
