@@ -1,0 +1,89 @@
+\chapter{E-1 Car rental}
+
+A small car rental company has a fleet of 94 vechiles distributed among its
+10 agencies. The location of every agency is given by its geographical coordinates
+$X$ and $Y$ in a grid based on kilometers. We assume that the road distance
+between agencies is approximately 1.3 times the Euclidean distance. Refer to
+\cref{table:coords} for the geographical coordinates of all agencies, the inventory
+of cars required the next morning, and the inventory of cars in the evening
+preceeding this day. Refer to \cref{table:car-stock} for the available and required
+inventories of the various agencies.
+
+Suppose the cost for transporting a car is $\euro{}0.50$ per km, determine the
+movements of cars that allow the company to re-establish the required numbers of
+cars at all agencies, minimizing the total cost incurred for transport.
+
+\section{Parameters}
+
+\begin{syms}
+
+\item[$A$] enumerates $n=10$ rental agencies, ie. $A=\left\lbrace 1,\ldots, n\right\rbrace$
+
+\item[$\vect{X}_a$] denotes the geographical coordinates of an agency $a\in A$, with
+    $\vect{X}_a \in \Real^2$, for convience let $\vect{X} \in \Real^{2\times n}$ with
+    columns $\vect{X}_a, \forall a\in A$
+
+\item[$r_a$] number of cars required by agency $a\in A$ on next morning
+
+\item[$s_a$] number of cars agency $a\in A$ has in the evening
+
+\item[$E$] part of the partition of $A$ with 
+    $E= \left\lbrace a\in A : s_a > r_a \right\rbrace \subset A$
+
+\item[$N$] part of the parition of $A$ with
+    $N = \left\lbrace a\in A: s_a < r_a \right\rbrace \subset A$
+
+\item[$c$] transporation cost in \euro{} / km, with $c=\euro{}0.50$ / km
+
+\item[$\lambda$] Euclidean distance to road distance multiplier, with $\lambda=1.3$
+
+\end{syms}
+
+\begin{table}[h]
+    \center
+    \caption{Geographical coordinates of agencies}\label{table:coords}
+    \begin{tabu}{lcccccccccc}
+        \hline
+        \rowfont[lcccccccccc]{\bfseries} Agency $a$ & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10\\
+        \hline
+        \textbf{X coordinate (km grid)} $X_a^{(x)}$ & 0 & 20 & 18 & 30 & 35 & 33 & 5 & 5 & 11 & 2 \\
+        \textbf{Y coordinate (km grid)} $X_a^{(y)}$ & 0 & 20 & 10 & 12 & 0 & 25 & 27 & 10 & 0 & 15 \\
+        \hline
+    \end{tabu}
+\end{table}
+
+\begin{table}[h]
+    \center
+    \caption{Available and required inventory of agencies}\label{table:car-stock}
+    \begin{tabu}{lcccccccccc}
+        \hline
+        \rowfont[lcccccccccc]{\bfseries} Agency $a$ & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10\\
+        \hline
+        \textbf{Cars present} $s_a$ & 8 & 13 & 4 & 8 & 12 & 2 & 14 & 11 & 15 & 7 \\
+        \textbf{Cars required} $r_a$ & 10 & 6 & 8 & 11 & 9 & 7 & 15 & 7 & 9 & 12 \\
+        \hline
+    \end{tabu}
+\end{table}
+
+\section{Decision variable}
+
+\begin{syms}
+
+    \item[$x_{ij}$] denotes the number of cars transpored from an agency
+        with excess $i\in E$ to an agency with shortage $j\in N$;
+        $0 \leq x_{ij} \in \Int$; for convience let $\vect{x} \in \Int^{|E|\times|N|}$
+        with entries $x_{ij}$
+
+\end{syms}
+
+\section{Model}
+
+\begin{mini!}
+    {\vect{x}}{f(\vect{x})=\sum_{i\in E}\sum_{j\in N} c \lambda x_{ij} \sqrt{\vect{X}_i - \vect{X}_j} \protect\label{eq:e1-obj}}{\label{eq:e1}}{}
+    \addConstraint{\sum_{i\in E} x_{ij}}{& = s_j - r_j, \forall j\in N \protect\label{eq:e1-ctr1}}
+    \addConstraint{\sum_{j\in N} x_{ij}}{& = s_i - r_i, \forall i\in N \protect\label{eq:e1-ctr2}}
+    \addConstraint{x_{ij}}{& \geq 0, \forall (i,j) \in E\times N \protect\label{eq:e1-ctr3}}
+\end{mini!}
+
+
+\section{Results}

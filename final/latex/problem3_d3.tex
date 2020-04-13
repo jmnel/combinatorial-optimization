@@ -1,0 +1,129 @@
+\chapter{D-3 Tank loading}
+
+Five tanker ships have arrived at a chemical factory. They are carrying loads
+of liquid products that must not be mixed. Refer to \cref{table:arrive} for
+these quantities. Nine tanks of different capacities are available on site.
+Some of them are already partially filled with a liquid. \Cref{table:tanks}
+lists the characteristics of the tanks (in tonnes). Into which tanks should
+the ships be unloaded (question 1) to maximize the capacity of the tanks
+that remain unused, or (question 2) to maximize the number of tanks that remain
+free?
+
+\section{Question 1}
+
+\subsection{Parameters}
+
+\begin{syms}
+
+\item[$T$] enumerates the $n=9$ tanks, ie. $T=\left\lbrace 1,\ldots,n\right\rbrace$
+
+\item[$L$] enumerates the $m=5$ types of liquid arriving at the facility:
+    $\left\lbrace \texttt{Benzol},\texttt{Butanol},\texttt{Propanol},
+    \texttt{Styrene}, \texttt{THF}\right\rbrace$ ie.
+    $L=\left\lbrace 1,\ldots, m\right\rbrace$.
+
+\item[$F$] the indices of the prefilled tanks, ie. 
+    $\left\lbrace \texttt{Benzol}, \texttt{THF}\right\rbrace$
+    with $F = \left\lbrace T\in L : \text{tank } t \text{ is prefilled}\right\rbrace \subset T$
+
+\item[$a_l$] denotes the amount (in tonnes) of liquid $l\in L$ arriving at the
+    facility
+
+\item[$c_t$] denotes the capacity (in tonnes) of tank $t\in T$
+
+\item[$Q_t$] denotes the innitial amount (in tonnes) of liquid in tank $t\in F$
+
+\item[$P_t$] denotes the type of liquid initially in tank $t\in F$
+
+\item[$R_l$] remainder of liquid $l\in L$ after filling prefilled tanks $t\in F$ 
+    to capacity with liquid of same type, given by
+
+
+\begin{equation}
+    R_l = \begin{cases}\displaystyle
+        a_l - \sum_{t\in F\text, P_t = l} c_t - Q_t & \text{if }t\in F\\
+        a_l & \text{otherwise}
+    \end{cases}
+\end{equation}
+
+\end{syms}
+    
+Refer to \cref{table:arrive} for the values of $a_l$ and \cref{table:tanks} for
+the values of $F, c_t, Q_t$, and $P_t$.
+
+\begin{table}
+    \center
+    \caption{Various types of liquid arriving at facility}\label{table:arrive}
+    \begin{tabu}{lcccccc}
+        \hline
+        \rowfont[lcccccc]{\bfseries} Type & Benzol & Butanol & Propanol & Styrene & THF \\
+        \hline
+        \textbf{Qauntity (in tonnes)} $a_l$ & 1200 & 700 & 1000 & 450 & 1200 \\
+        \hline
+    \end{tabu}
+\end{table}
+
+\begin{table}
+    \center
+    \caption{Facillity tank capacities and innitial quantities}\label{table:tanks}
+    \begin{tabu}{lccccccccc}
+        \hline
+        \rowfont[lccccccccc]{\bfseries} Tank & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9\\
+        \hline
+        \textbf{Capacity (tonnes)} $c_t$ & 500 & 400 & 400 & 600 & 600 & 900 & 800 & 800 & 800 \\
+        \textbf{Initial type} $Q_t$ & - & \texttt{Benzol} & - & - & - & - & \texttt{THF} & - & - \\
+        \textbf{Initial amount (tonnes)} $P_t$ & 0 & 100 & 0 & 0 & 0 & 0 & 300 & 0 & 0 \\
+        \hline
+    \end{tabu}
+\end{table}
+
+
+\subsection{Decision variable}
+
+\begin{syms}
+
+\item[$x_{lt}$] indicates that remaining liquid of type $l\in L$ is pumped into
+    tank $t\in T$, after prefilling; for convience let 
+    $\vect{x}\in\left\lbrace 0, 1\right\rbrace^{m\times n}$ with entries $x_{lt}$
+
+\end{syms}
+\subsection{Model} \label{section:3.1.3}
+
+\begin{mini!}
+    {\vect{x}}{f(\vect{x})=\sum_{l\in L}\sum_{t\in T\setminus F} c_t x_{lt} \protect\label{eq:d3-q1-obj}}{\label{eq:d3-q1}}{}
+    \addConstraint{\sum_{t\in T\setminus F} c_t x_{lt}}{& \geq R_l, \forall l\in L \protect\label{eq:d3-q1-ctr1}}
+    \addConstraint{\sum_{l\in L}x_{lt}}{& \leq 1, \forall t\in T\setminus F \protect\label{eq:d3-q1-ctr2}}
+    \addConstraint{x_{lt}}{& \in \left\lbrace 0, 1\right\rbrace, \forall (l,t)\in L\times T \protect\label{eq:d3-q1-ctr3}}
+\end{mini!}
+
+Maximizing the remaining capacity is equivalent to minmizing the used capacity
+in a tank as expressed in \cref{eq:d3-q1-obj}. The family of constraints
+\cref{eq:d3-q1-ctr1} ensures that all remaining liquid, after prefilling, is pumped
+into tanks for all liquids $l\in L$. Liquids of different types can not be
+allowed to mix in a tank. This is guaranteed by \cref{eq:d3-q1-ctr2}.
+Lastly, \cref{eq:d3-q1-ctr3} states that $\vect{x}$ must be a binary variable.
+
+\subsection{Results}
+
+\section{Question 2}
+
+We approach question 2 in almost an identical way as in question 1. The only thing
+that changes is the objective function. The model for question 2 is given
+below.
+
+\subsection{Model}
+
+\begin{mini!}
+    {\vect{x}}{g(\vect{x})=\sum_{l\in L}\sum_{t\in T\setminus F} x_{lt} \protect\label{eq:d3-q2-obj}}{\label{eq:d3-q2}}{}
+    \addConstraint{\sum_{t\in T\setminus F} c_t x_{lt}}{& \geq R_l, \forall l\in L \protect\label{eq:d3-q2-ctr1}}
+    \addConstraint{\sum_{l\in L}x_{lt}}{& \leq 1, \forall t\in T\setminus F \protect\label{eq:d3-q2-ctr2}}
+    \addConstraint{x_{lt}}{& \in \left\lbrace 0, 1\right\rbrace, \forall (l,t)\in L\times T \protect\label{eq:d3-q2-ctr3}}
+\end{mini!}
+
+\Cref{eq:d3-q2-obj} is similar to \cref{eq:d3-q1-obj} in \cref{section:3.1.3}.
+The only difference between $g(\vect{x})$ and $f(\vect{x})$ is that $g\vect{x})$
+does not include the tank capacities $c_t$. The result is, we are only counting
+the number of tanks that used. Once again, minimizing this quantity is clearly
+equivalent to maximizing the number of unused tanks.
+
+\subsection{Results}

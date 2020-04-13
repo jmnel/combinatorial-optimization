@@ -1,0 +1,78 @@
+\chapter{D-1 Wagon load balancing}
+
+Three railyay wagons with a carrying capacity of 100 quintals (1 quintal = 100 kg)
+have been reserved to transport sixteen boxes. The weight of the boxes in quintals
+is given in the following table. How shall the boxes be assigned to the wagons
+in order to keep to the limits on the maximum carrying capacity and to
+minimize the heaviest wagon load?
+
+\section{Parameters}
+
+\begin{syms}
+
+\item[$B$] enumerates $m=16$ boxes; ie. $B=\left\lbrace 1,\ldots, m\right\rbrace$
+
+\item[$W$] enumerates $n=3$ railway wagons; ie. $W=\left\lbrace 1,\ldots, n\right\rbrace$
+
+\item[$c$] denotes maximum capacity of a wagon in quintals, with $c=100$
+
+\item[$\mu_b$] denotes the weight of box $b\in B$
+
+\end{syms}
+
+Refer to \cref{table:2-1} for the values of the above parameters.
+
+\begin{table}[h]
+    \center
+    \caption{Weight of boxes}\label{table:2-1}
+    \begin{tabu}{lcccccccc}
+        \hline
+        \rowfont[lcccccccc]{\bfseries} Box & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+        \textbf{Weight} & 34 & 6 & 8 & 17 & 16 & 5 & 13 & 21 \\
+        \hline
+        \rowfont[lcccccccc]{\bfseries} Box & 9 & 10 & 11 & 12 & 13 & 14 & 15 & 16 \\
+        \textbf{Weight} & 25 & 31 & 14 & 13 & 33 & 9 & 25 & 25 \\
+        \hline
+
+    \end{tabu}
+\end{table}
+
+\section{Decision variable}
+
+\begin{syms}
+
+\item[$x_{bw}$] indicates box $b\in B$ is loaded in wagon $w\in W$; 
+    $x_{bw}\in \left\lbrace 0, 1\right\rbrace$. For convience let
+    $\vect{x} \in \left\lbrace 0, 1\right\rbrace^{m\times n}$
+    with entries $x_{bw}, \forall (b,w) \in B\times W$.
+
+\item[$m$] ancillary variable denoting upper bound of weights in
+    quintals of all wagons;
+    $0\leq m\in\Int$
+\end{syms}
+
+\section{Model}
+
+\begin{mini!}
+    {\vect{x}}{f(m)=m \protect\label{eq:d1-obj}}{\label{eq:d1}}{}
+    \addConstraint{\sum_{w\in W}x_{bw}}{= 1, \forall b \in B \protect\label{eq:d1-ctr1}}
+    \addConstraint{m}{\geq \sum_{b\in B}\mu_b x_{bw}, \forall w \in W \protect\label{eq:d1-ctr2}}
+    \addConstraint{\sum_{b\in B}\mu_b x_{bw}}{\leq c, \forall w\in W\protect\label{eq:d1-ctr3}}
+    \addConstraint{x_{bw}}{\in\left\lbrace 0, 1\right\rbrace, \forall \left(b,w\right)\in B\times W\protect\label{eq:d1-ctr4}}
+    \addConstraint{m}{\geq 0 \protect\label{eq:d1-ctr5}}
+\end{mini!}
+
+The objective we week to minimize \cref{eq:d1-obj} is simply $m$ or rather,
+the upper bound on the weights of each wagon $w\in W$. Each box $b\in B$ must
+be loaded in exactly one wagon $w\in W$ as stated by \cref{eq:d1-ctr1}. 
+
+For
+$m$ to be the least upper bound of the weights of each wagon $w\in W$,
+$m$ must be greater than all wagon weights as expressed in \cref{eq:d1-ctr2}. Minimization will lower it until
+it is equal to the maximum of the weights of the loaded wagons. Note that this
+objective is wrong in the text.
+
+\Cref{eq:d1-ctr4} enforces that the decision variable $\vect{x}$ is a binary indicator,
+and \cref{eq:d1-ctr5} is the canonical non-negativity constraint on $m$.
+
+\section{Results}

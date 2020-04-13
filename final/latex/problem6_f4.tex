@@ -1,0 +1,124 @@
+\chapter{F-4 Airline hub location}
+
+The airline FAL (French Air Lines) sepcializes in freight transport. The company
+links the major French cities with cities in the United States,
+nameley Atlanta, Boston, Chicago, Marseille, Nice, and Paris. The average
+quantities in tonnes transported every day by this company between these cities
+are given in \cref{table:f4-quant}.
+
+We shall assume that the transport cost between two cities $i$ and $j$
+is proportional to the distance that seperates them. The distances in miles
+are given in \cref{table:f4-dist}.
+
+The airline is planning to use two cities as connection paltforms
+(\textbf{hubs}) to reduce the transport costs. Every city is then assigned a single
+hub. The traffic between cities assigned to a given hub $H_1$ to the cities
+assigned to the other hub $H_2$ is all routed through the single connection
+form $H_1$ to $H_2$ which allows the airline to reduce the transport cost
+by 20\%. Determine the two cities to be chosen as hubs in order to minimize
+the transport cost.
+
+\section{Parameters}
+
+\begin{syms}
+
+\item[$C$] enumerates $m=5$ cities: 
+$\left\lbrace \texttt{Atlanta}, \texttt{Boston}, \texttt{Chicago}, \texttt{Marseille}, \texttt{Nice}\right\rbrace$,
+ie. $C=\left\lbrace 1, \ldots, n\right\rbrace$
+
+\item[$n$] denotes the number of hubs to choose, with $n=2$
+    
+\item[$q_{ij}$] denotes the average quantity of goods in tonnes transported between city
+    $i\in C$ and $j\in C$ in a given day
+
+\item[$d_{ij}$] denotes the distance from city $i\in C$ to city $j\in C$
+
+%\item[$f_{ij}$] is the non-reduced transportation cost from city $i\in C$ to city $j\in C$
+
+\item[$c_{ijkl}$] is proportional to the transportation cost from city $i\in C$ to city $j\in C$ through
+    hubs $k\in C$ and $l\in C$
+
+\item[$r$] is the reduced hub to hub transport cost factor, with $r=0.8$
+
+\end{syms}
+
+$c_{ijkl}$ is calculated from $d_{ij}$ and $r$ as follows:
+
+\begin{equation}
+    c_{ijkl} = d_{ik} + rd_{kl} + d_{lj}, \forall i,j,k,l \in C
+\end{equation}
+
+\emph{Note:} When any one of the two suscripts are equal, we have $d_{ii}=0$.
+
+\begin{table}
+    \center
+    \caption{Average daily quantities of freight in tonnes}\label{table:f4-quant}
+    \begin{tabu}{lcccccc}
+        \hline
+        \rowfont[lcccccc]{\bfseries} & Atlanta & Boston & Chicago & Marseille & Nice & Paris \\
+        \hline
+        \textbf{Atlanta} & 0 & 500 & 1000 & 300 & 400 & 1500 \\
+        \textbf{Boston} & 1500 & 0 & 250 & 630 & 360 & 1140 \\
+        \textbf{Chicago} & 400 & 510 & 0 & 460 & 320 & 490 \\
+        \textbf{Marseille} & 300 & 600 & 810 & 0 & 820 & 310 \\
+        \textbf{Nice} & 400 & 100 & 420 & 730 & 0 & 970 \\
+        \textbf{Paris} & 350 & 1020 & 260 & 580 & 380 & 0 \\
+        \hline
+    \end{tabu}
+\end{table}
+
+\begin{table}
+    \center
+    \caption{Distances between pairs of cities in miles}\label{table:f4-dist}
+    \begin{tabu}{lccccc}
+        \hline
+        \rowfont[lccccc]{\bfseries} & Boston & Chicago & Marseille & Nice & Paris \\
+        \hline
+        \textbf{Atlanta} & 945 & 605 & 4667 & 4749 & 4394 \\
+        \textbf{Boston} & & 866 & 3726 & 3806 & 3448 \\
+        \textbf{Chicago} & & & 4471 & 4541 & 4152 \\
+        \textbf{Marseille} & & & & 109 & 415 \\
+        \textbf{Nice} & & & & & 431 \\
+        \hline
+    \end{tabu}
+\end{table}
+
+\newpage
+
+\section{Decision variables}
+
+\begin{syms}
+
+\item[$x_{ijkl}$] indicates that the cargo flows from city $i\in C$ to city
+    $j\in C$ via hubs $k\in C$ and $l\in C$, in other words
+
+    $x_{ijkl} = \begin{cases}1 & \text{cargo flows from city }i\text{ to }j\text{ via hub }k\text{ to }l \\
+        0 & \text{otherwise}
+    \end{cases}$,
+
+    for convenience, define the tensor $\vect{x} \in \left\lbrace 0, 1\right\rbrace^{n\times n\times n\times n}$
+    with entries $x_{ijkl}$
+
+\item[$y_i$] indicates whether city $i\in C$ is a hub, in other words
+
+        $y_i = \begin{cases}1 & \text{city }i\text{ is a hub} \\
+            0 & \text{otherwise}
+        \end{cases}$,
+
+    for convenience, define the tuple $\vect{y} = \left( y_1,\ldots, y_n\right) \in \left\lbrace 0, 1\right\rbrace^n$
+
+
+\end{syms}
+
+\section{Model}
+
+\begin{mini!}
+    {\vect{x}}{f(\vect{x})=\mathop{\sum\sum\sum\sum}_{i,j,k,l\in C} c_{ijkl} c_{ijkl}q_{ij}x_{ijkl} \protect\label{eq:f4-obj}}{\label{eq:f4}}{}
+    \addConstraint{\sum_{i\in C} y_i}{= n \protect\label{eq:f4-ctr1}}
+    \addConstraint{\mathop{\sum\sum}_{k,l\in C} x_{ijkl}}{= 1, \forall i, j\in C \protect\label{eq:f4-ctr-2}}
+    \addConstraint{x_{ijkl}}{\leq y_{k}, \forall i,j, k, l \in C \protect\label{eq:f4-ctr-3}}
+    \addConstraint{x_{ijkl}}{\leq y_{l}, \forall i,j, k, l \in C \protect\label{eq:f4-ctr-4}}
+    \addConstraint{x_{ijkl}}{\in \left\lbrace 0, 1\right\rbrace, \forall i,j,k,l \in C \protect\label{eq:f4-ctr-5}}
+    \addConstraint{y_i}{\in \left\lbrace 0, 1\right\rbrace, \forall i\in C \protect\label{eq:f4-ctr-6}}
+\end{mini!}
+\section{Results}

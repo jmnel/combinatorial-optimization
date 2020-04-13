@@ -1,0 +1,109 @@
+\documentclass[8pt,oneside]{extbook}
+
+%\usepackage{subfigure}
+\usepackage{subcaption}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{hyperref}
+\usepackage{adjustbox}
+\usepackage{listings}
+\usepackage{optidef}
+\usepackage{cleveref}
+\usepackage{threeparttable}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{mathrsfs}
+\usepackage[gen]{eurosym}
+\usepackage[driver=pdftex]{geometry}
+\usepackage{import}
+\usepackage{tabu}
+%\usepackage{titleformat{\section
+%        {\normalfont\normalzie\bfseries}{Helo.}{1em}{}
+
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\crefname{table}{table}{table}
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0.7em}
+
+%\counterwithin{table}{section}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\newlist{syms}{itemize}{1}
+\setlist[syms,1]{label=,labelwidth=0.25in,align=parleft,itemsep=0.1\baselineskip,leftmargin=!}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{definition}{Definition}
+\newtheorem{proof}{Proof}
+ 
+\lstset{style=mystyle}
+
+%\usepackage[margin=0.5in]{geometry}
+\usepackage{inputenc}
+
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\Int}{\mathbb{Z}}
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\Complex}{\mathbb{C}}
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+
+%\renewcommand{\TPTminimum}{\textwidth}
+
+\renewcommand{\Re}[1]{\mathfrak{Re}\left\lbrace{#1}\right\rbrace}
+\renewcommand{\Im}[1]{\mathfrak{Im}\left\lbrace{#1}\right\rbrace}
+
+%\DeclareMathOperator*{\minimize}{minimize}
+%\DeclareMathOperator*{\maximize}{maximize}
+
+%\title{{\bf MATH 3172 3.0\\ Combinatorial Optimization}\\\vspace{10pt} \large Final Exam
+%    \author{Jacques Nel}
+%}
+
+\title{{\bf LE/EECS 3172 3.0\\ Combinatorial Optimization}\\\vspace{10pt} \large Final Exam
+    \author{Jacques Nel}
+}
+
+\begin{document}
+
+\maketitle
+
+\thispagestyle{empty}
+
+\newpage
+
+\pagenumbering{arabic}
+
+\include{problem1_b2}
+\include{problem2_d1}
+\include{problem3_d3}
+\include{problem4_e1}
+\include{problem5_e5}
+\include{problem6_f4}
+
+
+\end{document}

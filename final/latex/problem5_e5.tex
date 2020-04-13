@@ -1,0 +1,110 @@
+\chapter{E-5 Combining different modes of transport}
+
+A load of 20 tonnes needs to be transported on a rouate passing through five cities,
+with a choice of three different modes of transport: rail, road, and air. In any
+of the three intermediate cities it is possible to change the mode of transport
+but the load uses a single mode of transport between two consecutive cities.
+Refer to \cref{table:transport-costs} for the cost of the various modes of
+transport between pairs of cities.
+
+Furthermore, changing the mode of tranport incurs an associated cost. This cost
+is indepdependent of location. Refer to \cref{table:transfer-costs} for these
+costs.
+
+How should we organize the transport of the load at the least cost?
+
+\section{Parameters}
+
+\begin{syms}
+
+\item[$M$] enumerates the $n=3$ modes of transport:
+    $\left\lbrace \texttt{rail}, \texttt{road}, \texttt{air}\right\rbrace$,
+    with $M=\left\lbrace 1, \ldots, n\right\rbrace$
+
+\item[$L$] enumerates the $k=5$ legs of the route between the cities, ie.
+    $L=\left\lbrace 1,\ldots, k\right\rbrace$
+
+\item[$c_{ml}$] denotes the transportation cost per tonne on leg $l\in L$ of the route
+    using mode $m\in M$
+
+\item[$t_{ij}$] denotes the cost per tonne of transfering the cargo from mode $i\in M$ to mode
+    $j\in M$ at a given city
+
+\item[$q$] denotes the weight of the cargo in tonnes with $q=20$ tonnes
+
+\end{syms}
+
+Refer to \cref{table:transport-costs} for values of $c_{ml}$ and to \cref{table:transfer-costs}
+for values of $t_{ij}$.
+
+\begin{table}[h]
+    \center
+    \caption{Transportation costs between pairs of cities using various modes of transport}
+    \label{table:transport-costs}
+    \begin{tabu}{lcccc}
+        \hline
+        \rowfont[lcccc]{\bfseries} & 1-2 & 2-3 & 3-4 & 4-5 \\
+        \hline
+        \textbf{Rail} & 30 & 25 & 40 & 60 \\
+        \textbf{Road} & 25 & 40 & 45 & 50 \\
+        \textbf{Air} & 40 & 20 & 50 & 45 \\
+        \hline
+    \end{tabu}
+\end{table}
+
+\begin{table}[h]
+    \center
+    \caption{Costs of changing mode of transport}\label{table:transfer-costs}
+    \begin{tabu}{lccc}
+        \hline
+        \rowfont[lccc]{\bfseries} from/to & Rail & Road & Air \\
+        \hline
+        \textbf{Rail} & 0 & 5 & 12 \\
+        \textbf{Road} & 8 & 0 & 10 \\
+        \textbf{Air} & 15 & 10 & 0 \\
+        \hline
+    \end{tabu}
+\end{table}
+
+\section{Decision variables}
+
+\begin{syms}
+
+\item[$x_{ml}$] indicates that mode $m\in M$ is used on leg $l\in L$ of the route;
+    $x_{ml} \in \left\lbrace 0, 1\right\rbrace$; for convenience, let
+    $\vect{x} \in \left\lbrace 0, 1\right\rbrace^{n\times k}$ with entries
+    $x_{ml}$
+
+\item[$y_{ijl}$] indicates whether cargo is transfered from mode $i\in M$ to mode
+    $j\in M$ after leg $l\in L$ of the journey; $y_{ijl}\in\left\lbrace 0, 1\right\rbrace$;
+    for convenience, we define the tensor 
+    $\vect{y} \in\left\lbrace 0, 1\right\rbrace^{n\times n\times k}$
+
+\end{syms}
+
+\section{Model}
+
+The total tranportation cost is given by
+
+\begin{equation}
+    g(\vect{x}) = \sum_{m\in M}\sum_{l\in l} c_{ml} x_{ml}.
+\end{equation}
+
+The total cost of transfering the cargo between modes of transportation
+is
+
+\begin{equation}
+    h(\vect{y}) = \sum_{i\in M}\sum_{j\in M}\sum_{l\in L\setminus \left\lbrace k\right\rbrace}
+    t_{ij}y_{ijl}
+\end{equation}
+
+\begin{mini!}
+    {\vect{x}}{f(\vect{x},\vect{y})=g(\vect{x}) +h(\vect{y}) \protect\label{eq:e5-obj}}{\label{eq:e5}}{}
+    \addConstraint{\sum_{m\in M}x_{ml}}{& = 1, \forall l\in L \protect\label{eq:e5-ctr1}}
+    \addConstraint{\sum_{i, j\in M} y_{ijl}}{& = 1, \forall l\in L\setminus\left\lbrace k\right\rbrace \protect\label{eq:e5-ctr2}}
+    \addConstraint{x_{il}}{& \geq y_{ijl}, \forall i, j \in M, l\in L\setminus\left\lbrace k\right\rbrace \protect\label{eq:e5-ctr3}}
+    \addConstraint{x_{ml}}{& \in \left\lbrace 0, 1\right\rbrace, \forall m\in M, l\in L \protect\label{eq:e5-ctr4}}
+    \addConstraint{y_{ijl}}{& \in \left\lbrace 0, 1\right\rbrace, \forall i,j \in M, l\in L \protect\label{eq:e5-ctr5}}
+\end{mini!}
+
+\section{Results}

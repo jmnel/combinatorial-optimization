@@ -1,0 +1,51 @@
+Dromedary Studio Education Version 2.1.1 (March 3rd 2020 18:14:22) [Python 3.7.4 h5263a28_0] :: Dromedary Inc.
+
+
+
+# Solution Report:
+# Problem: min_sheets_model
+# Solversuccess: True
+# Solverstatus: OPTIMAL; finished; search completed with solution; 0 B&B nodes
+# Objective value: 11.0
+# Primal values:
+use[0] = 3.0
+use[1] = 0.0
+use[2] = 5.0
+use[3] = 2.0
+use[4] = 0.0
+use[5] = 0.0
+use[6] = 1.0
+use[7] = 0.0
+use[8] = 0.0
+use[9] = 0.0
+use[10] = 0.0
+use[11] = 0.0
+use[12] = 0.0
+use[13] = 0.0
+use[14] = 0.0
+use[15] = 0.0
+# Slacks:
+cstr1['36x50']: 0.0
+cstr1['24x36']: 0.0
+cstr1['20x60']: 0.0
+cstr1['18x30']: 0.0
+cstr2[0]: 3.0
+cstr2[1]: 0.0
+cstr2[2]: 5.0
+cstr2[3]: 2.0
+cstr2[4]: 0.0
+cstr2[5]: 0.0
+cstr2[6]: 1.0
+cstr2[7]: 0.0
+cstr2[8]: 0.0
+cstr2[9]: 0.0
+cstr2[10]: 0.0
+cstr2[11]: 0.0
+cstr2[12]: 0.0
+cstr2[13]: 0.0
+cstr2[14]: 0.0
+cstr2[15]: 0.0
+# Duals: (if provided by the solver)
+# End of solution report.
+
+
