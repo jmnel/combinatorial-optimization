@@ -70,6 +70,7 @@ x = Variable(vartype='binary', index=CCCC)
 y = Variable(vartype='binary', index=C)
 
 print(len(cccc))
+print(x)
 
-foo = sum( COST[i][j][k][l]  * Q[i][j] * x[i, j, k, l] for i, j, k, l in cccc )
+foo = sum( x[i, j, k, l] for i, j, k, l in cccc )
 
